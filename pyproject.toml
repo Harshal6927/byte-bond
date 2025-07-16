@@ -1,0 +1,39 @@
+[project]
+authors = [{ name = "Harshal Laheri", email = "harshal@harshallaheri.me" }]
+dependencies = [
+    "advanced-alchemy>=1.4.5",
+    "litestar[standard]>=2.16.0",
+    "pre-commit>=4.2.0",
+    "psycopg[binary,pool]>=3.2.9",
+    "python-dotenv>=1.1.1",
+]
+description = "Add your description here"
+name = "byte-bond"
+readme = "README.md"
+requires-python = ">=3.12"
+version = "0.1.0"
+
+[build-system]
+build-backend = "hatchling.build"
+requires = ["hatchling"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/backend"]
+
+[tool.ruff]
+line-length = 120
+lint.ignore = [
+    "D100",
+    "D101",
+    "D102",
+    "D103",
+    "D104",
+    "D105",
+    "D106",
+    "CPY001",
+    "RUF012",
+    "RUF029",
+    "ERA001",
+    "PLR6301",
+    "ANN204",
+]
