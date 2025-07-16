@@ -1,11 +1,11 @@
-from __future__ import annotations
-
 from typing import Any
 
 import click
+from click import Group
+from litestar.plugins import CLIPluginProtocol
 
 
-@click.group(name="users", invoke_without_command=False, help="Manage application users for networking game.")
+@click.group(name="users", invoke_without_command=False, help="Manage application users.")
 @click.pass_context
 def user_management_group(_: dict[str, Any]) -> None:
     """Manage application users."""
@@ -27,13 +27,6 @@ def user_management_group(_: dict[str, Any]) -> None:
     show_default=False,
 )
 @click.option(
-    "--event-code",
-    help="Event code to join",
-    type=click.STRING,
-    required=False,
-    show_default=False,
-)
-@click.option(
     "--admin",
     help="Is an admin user",
     type=click.BOOL,
@@ -45,52 +38,33 @@ def user_management_group(_: dict[str, Any]) -> None:
 def create_user(
     email: str | None,
     name: str | None,
-    event_code: str | None,
     admin: bool | None,
 ) -> None:
-    """Create a user for the networking game."""
     from typing import cast
 
     import anyio
     import click
     from rich import get_console
 
-    from backend.config import alchemy
-    from backend.lib.dependencies import provide_event_service, provide_user_service
+    from backend.config import sqlalchemy_config
+    from backend.lib.dependencies import provide_user_service
 
     console = get_console()
 
     async def _create_user(
         email: str,
         name: str,
-        event_code: str,
         is_admin: bool = False,
     ) -> None:
-        async with alchemy.get_session() as db_session:
+        async with sqlalchemy_config.get_session() as db_session:
             # Get services
-            event_service = await anext(provide_event_service(db_session))
             user_service = await anext(provide_user_service(db_session))
-
-            # Find the event
-            event = await event_service.get_one_or_none(code=event_code)
-            if not event:
-                console.print(f"[red]Error: Event with code '{event_code}' not found[/red]")
-                return
-
-            # Check if user already exists for this event
-            existing_user = await user_service.get_one_or_none(email=email, event_id=event.id)
-            if existing_user:
-                console.print(f"[yellow]Warning: User {email} already exists for event '{event_code}'[/yellow]")
-                return
 
             # Create user data
             user_data = {
                 "name": name,
                 "email": email,
-                "event_id": event.id,
                 "is_admin": is_admin,
-                "points": 0,
-                "connection_count": 0,
             }
 
             # Create the user
@@ -98,17 +72,19 @@ def create_user(
             console.print("[green]User created successfully![/green]")
             console.print(f"Name: {user.name}")
             console.print(f"Email: {user.email}")
-            console.print(f"Event: {event.name} ({event.code})")
-            console.print(f"QR Code: {user.qr_code}")
             console.print(f"Admin: {user.is_admin}")
 
-    console.rule("Create a new user for networking game")
+    console.rule("Create a new user")
     email = email or click.prompt("Email")
     name = name or click.prompt("Full Name")
-    event_code = event_code or click.prompt("Event Code")
     admin = admin or click.prompt("Create as admin?", default=False, type=click.BOOL)
 
-    anyio.run(_create_user, cast("str", email), cast("str", name), cast("str", event_code), cast("bool", admin))
+    anyio.run(_create_user, cast("str", email), cast("str", name), cast("bool", admin))
+
+
+class CLIPlugin(CLIPluginProtocol):
+    def on_cli_init(self, cli: Group) -> None:
+        cli.add_command(user_management_group)
 
 
 # @user_management_group.command(name="create-event", help="Create a new event")

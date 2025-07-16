@@ -2,7 +2,7 @@
 authors = [{ name = "Harshal Laheri", email = "harshal@harshallaheri.me" }]
 dependencies = [
     "advanced-alchemy>=1.4.5",
-    "litestar[standard]>=2.16.0",
+    "litestar[jwt,standard]>=2.16.0",
     "pre-commit>=4.2.0",
     "psycopg[binary,pool]>=3.2.9",
     "python-dotenv>=1.1.1",
@@ -36,4 +36,9 @@ lint.ignore = [
     "ERA001",
     "PLR6301",
     "ANN204",
+    "PLC0415",
+    "FBT001",
+    "FBT002",
+    "TRY003",
+    "EM101",
 ]

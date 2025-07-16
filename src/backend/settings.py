@@ -10,8 +10,14 @@ console = get_console()
 
 @dataclass
 class Settings:
+    debug: bool = field(
+        default_factory=lambda: os.getenv("DEBUG", "false").lower() in {"true", "1", "yes"},
+    )
     db_connection_string: str = field(
         default_factory=lambda: os.getenv("DB_CONNECTION_STRING"),
+    )
+    secret_key: str = field(
+        default_factory=lambda: os.getenv("SECRET_KEY"),
     )
 
     def __post_init__(self) -> None: ...
@@ -23,7 +29,7 @@ class Settings:
         )
 
         if env_file.is_file():
-            from dotenv import load_dotenv  # noqa: PLC0415
+            from dotenv import load_dotenv
 
             console.print(
                 f"[yellow]Loading environment configuration from {dotenv_filename}[/]",
