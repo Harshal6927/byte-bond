@@ -1,0 +1,57 @@
+[project]
+authors = [{ name = "Harshal Laheri", email = "harshal@harshallaheri.me" }]
+dependencies = [
+    "advanced-alchemy>=1.6.0",
+    "litestar-saq>=0.5.3",
+    "litestar-vite>=0.14.0",
+    "litestar[jwt,opentelemetry,standard]>=2.17.0",
+    "logfire>=4.1.0",
+    "pre-commit>=4.2.0",
+    "psycopg[binary,pool]>=3.2.9",
+    "python-dotenv>=1.1.1",
+    "sqladmin-litestar-plugin>=0.2.0",
+]
+description = "Add your description here"
+name = "byte-bond"
+readme = "README.md"
+requires-python = ">=3.12"
+version = "0.1.0"
+
+[build-system]
+build-backend = "hatchling.build"
+requires = ["hatchling"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/backend"]
+
+[tool.hatch.build.targets.wheel.sources]
+"src/backend" = "src/backend"
+
+[project.scripts]
+app = "src.backend.__main__:run_cli"
+
+[tool.ruff]
+line-length = 120
+lint.ignore = [
+    "D100",
+    "D101",
+    "D102",
+    "D103",
+    "D104",
+    "D105",
+    "D106",
+    "D107",
+    "CPY001",
+    "RUF012",
+    "RUF029",
+    "ERA001",
+    "PLR0913",
+    "PLR0917",
+    "PLR6301",
+    "ANN204",
+    "PLC0415",
+    "FBT001",
+    "FBT002",
+    "TRY003",
+    "EM101",
+]

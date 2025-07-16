@@ -1,0 +1,69 @@
+from typing import TYPE_CHECKING, Any
+
+from advanced_alchemy.exceptions import IntegrityError, NotFoundError, RepositoryError
+from advanced_alchemy.extensions.litestar.exception_handler import (
+    ConflictError,
+)
+from litestar import Request, Response
+from litestar.connection import ASGIConnection
+from litestar.exceptions import (
+    HTTPException,
+    NotAuthorizedException,
+    NotFoundException,
+)
+from litestar.exceptions.responses import create_exception_response
+from litestar.handlers import BaseRouteHandler
+from litestar.status_codes import (
+    HTTP_409_CONFLICT,
+    HTTP_500_INTERNAL_SERVER_ERROR,
+)
+from litestar.types import LitestarEncodableType
+
+from src.backend.models import User
+
+if TYPE_CHECKING:
+    from litestar.channels.plugin import ChannelsPlugin
+
+
+class _HTTPConflictException(HTTPException):
+    """Request conflict with the current state of the target resource."""
+
+    status_code = HTTP_409_CONFLICT
+
+
+def exception_handler(
+    request: Request[User, Any, Any],
+    exc: Exception,
+) -> Response:
+    http_exc: type[HTTPException]
+
+    if isinstance(exc, NotFoundError):
+        http_exc = NotFoundException
+    elif isinstance(exc, ConflictError | RepositoryError | IntegrityError):
+        http_exc = _HTTPConflictException
+    else:
+        return create_exception_response(
+            request,
+            HTTPException(
+                status_code=getattr(exc, "status_code", HTTP_500_INTERNAL_SERVER_ERROR),
+                detail=str(exc),
+            ),
+        )
+
+    return create_exception_response(request, http_exc(detail=str(exc.detail)))
+
+
+def admin_user_guard(connection: ASGIConnection, _: BaseRouteHandler) -> None:
+    if not connection.user.is_admin:
+        raise NotAuthorizedException
+
+
+def publish_to_channel(request: Request[User, Any, Any], data: LitestarEncodableType, channel: str) -> None:
+    channels: ChannelsPlugin = request.app.plugins.get(
+        "litestar.channels.plugin.ChannelsPlugin",
+    )
+
+    channels.publish(
+        data=data,
+        channels=channel,
+    )
