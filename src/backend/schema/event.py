@@ -1,11 +1,12 @@
 from datetime import datetime
+from typing import Annotated
 
-from msgspec import UNSET, Struct, UnsetType
+from msgspec import UNSET, Meta, Struct, UnsetType
 
 
 class PostEvent(Struct):
-    name: str
-    code: str
+    name: Annotated[str, Meta(min_length=1)]
+    code: Annotated[str, Meta(min_length=1, max_length=64)]
 
 
 class GetEvent(Struct):
@@ -19,11 +20,7 @@ class GetEvent(Struct):
 
 
 class PatchEvent(Struct):
-    name: str | UnsetType = UNSET
-    code: str | UnsetType = UNSET
+    name: Annotated[str, Meta(min_length=1)] | UnsetType = UNSET
+    code: Annotated[str, Meta(min_length=1, max_length=64)] | UnsetType = UNSET
     is_active: bool | UnsetType = UNSET
     whitelist: dict | UnsetType = UNSET
-
-
-class DeleteEvent(Struct):
-    id: int

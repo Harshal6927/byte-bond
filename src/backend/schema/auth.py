@@ -1,6 +1,8 @@
-from msgspec import Struct
+from typing import Annotated
+
+from msgspec import Meta, Struct
 
 
 class PostLogin(Struct):
-    email: str
-    event_code: str
+    email: Annotated[str, Meta(min_length=1)]
+    event_code: Annotated[str, Meta(min_length=1, max_length=64)]

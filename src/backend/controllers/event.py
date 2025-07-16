@@ -22,12 +22,7 @@ class EventController(Controller):
         data: PostEvent,
         event_service: EventService,
     ) -> GetEvent:
-        event = await event_service.create(
-            data={
-                "name": data.name,
-                "code": data.code,
-            },
-        )
+        event = await event_service.create(data)
         return event_service.to_schema(event, schema_type=GetEvent)
 
     @get()

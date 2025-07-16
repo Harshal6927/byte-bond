@@ -1,14 +1,15 @@
 from datetime import datetime
+from typing import Annotated
 
-from msgspec import UNSET, Struct, UnsetType
+from msgspec import UNSET, Meta, Struct, UnsetType
 
 from backend.models import UserStatus
 
 
 class PostUser(Struct):
-    name: str
-    email: str
-    event_code: str
+    name: Annotated[str, Meta(min_length=1)]
+    email: Annotated[str, Meta(min_length=1)]
+    event_code: Annotated[str, Meta(min_length=1, max_length=64)]
 
 
 class GetUser(Struct):
@@ -26,8 +27,4 @@ class GetUser(Struct):
 
 
 class PatchUser(Struct):
-    name: str | UnsetType = UNSET
-
-
-class DeleteUser(Struct):
-    id: int
+    name: Annotated[str, Meta(min_length=1)] | UnsetType = UNSET
