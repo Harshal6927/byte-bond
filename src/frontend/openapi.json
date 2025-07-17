@@ -104,13 +104,13 @@
                 "deprecated": false
             }
         },
-        "/events/{event_id}": {
+        "/api/events/{event_id}": {
             "get": {
                 "tags": [
                     "Events"
                 ],
                 "summary": "GetEvent",
-                "operationId": "EventsEventIdGetEvent",
+                "operationId": "ApiEventsEventIdGetEvent",
                 "parameters": [
                     {
                         "name": "event_id",
@@ -180,7 +180,7 @@
                     "Events"
                 ],
                 "summary": "DeleteEvent",
-                "operationId": "EventsEventIdDeleteEvent",
+                "operationId": "ApiEventsEventIdDeleteEvent",
                 "parameters": [
                     {
                         "name": "event_id",
@@ -250,7 +250,7 @@
                     "Events"
                 ],
                 "summary": "PatchEvent",
-                "operationId": "EventsEventIdPatchEvent",
+                "operationId": "ApiEventsEventIdPatchEvent",
                 "parameters": [
                     {
                         "name": "event_id",
@@ -326,13 +326,13 @@
                 "deprecated": false
             }
         },
-        "/events": {
+        "/api/events": {
             "get": {
                 "tags": [
                     "Events"
                 ],
                 "summary": "GetEvents",
-                "operationId": "EventsGetEvents",
+                "operationId": "ApiEventsGetEvents",
                 "responses": {
                     "200": {
                         "description": "Request fulfilled, document follows",
@@ -356,7 +356,7 @@
                     "Events"
                 ],
                 "summary": "PostEvent",
-                "operationId": "EventsPostEvent",
+                "operationId": "ApiEventsPostEvent",
                 "requestBody": {
                     "content": {
                         "application/json": {
@@ -421,13 +421,13 @@
                 "deprecated": false
             }
         },
-        "/questions/{question_id}": {
+        "/api/questions/{question_id}": {
             "get": {
                 "tags": [
                     "Questions"
                 ],
                 "summary": "GetQuestion",
-                "operationId": "QuestionsQuestionIdGetQuestion",
+                "operationId": "ApiQuestionsQuestionIdGetQuestion",
                 "parameters": [
                     {
                         "name": "question_id",
@@ -497,7 +497,7 @@
                     "Questions"
                 ],
                 "summary": "DeleteQuestion",
-                "operationId": "QuestionsQuestionIdDeleteQuestion",
+                "operationId": "ApiQuestionsQuestionIdDeleteQuestion",
                 "parameters": [
                     {
                         "name": "question_id",
@@ -567,7 +567,7 @@
                     "Questions"
                 ],
                 "summary": "PatchQuestion",
-                "operationId": "QuestionsQuestionIdPatchQuestion",
+                "operationId": "ApiQuestionsQuestionIdPatchQuestion",
                 "parameters": [
                     {
                         "name": "question_id",
@@ -643,13 +643,13 @@
                 "deprecated": false
             }
         },
-        "/questions": {
+        "/api/questions": {
             "get": {
                 "tags": [
                     "Questions"
                 ],
                 "summary": "GetQuestions",
-                "operationId": "QuestionsGetQuestions",
+                "operationId": "ApiQuestionsGetQuestions",
                 "responses": {
                     "200": {
                         "description": "Request fulfilled, document follows",
@@ -673,7 +673,7 @@
                     "Questions"
                 ],
                 "summary": "PostQuestion",
-                "operationId": "QuestionsPostQuestion",
+                "operationId": "ApiQuestionsPostQuestion",
                 "requestBody": {
                     "content": {
                         "application/json": {
@@ -738,13 +738,13 @@
                 "deprecated": false
             }
         },
-        "/users/{user_id}": {
+        "/api/users/{user_id}": {
             "get": {
                 "tags": [
                     "Users"
                 ],
                 "summary": "GetUser",
-                "operationId": "UsersUserIdGetUser",
+                "operationId": "ApiUsersUserIdGetUser",
                 "parameters": [
                     {
                         "name": "user_id",
@@ -814,7 +814,7 @@
                     "Users"
                 ],
                 "summary": "DeleteUser",
-                "operationId": "UsersUserIdDeleteUser",
+                "operationId": "ApiUsersUserIdDeleteUser",
                 "parameters": [
                     {
                         "name": "user_id",
@@ -884,7 +884,7 @@
                     "Users"
                 ],
                 "summary": "PatchUser",
-                "operationId": "UsersUserIdPatchUser",
+                "operationId": "ApiUsersUserIdPatchUser",
                 "parameters": [
                     {
                         "name": "user_id",
@@ -960,13 +960,13 @@
                 "deprecated": false
             }
         },
-        "/users": {
+        "/api/users": {
             "get": {
                 "tags": [
                     "Users"
                 ],
                 "summary": "GetUsers",
-                "operationId": "UsersGetUsers",
+                "operationId": "ApiUsersGetUsers",
                 "responses": {
                     "200": {
                         "description": "Request fulfilled, document follows",
@@ -990,7 +990,7 @@
                     "Users"
                 ],
                 "summary": "PostUser",
-                "operationId": "UsersPostUser",
+                "operationId": "ApiUsersPostUser",
                 "requestBody": {
                     "content": {
                         "application/json": {
@@ -1055,13 +1055,13 @@
                 "deprecated": false
             }
         },
-        "/user-answers/{user_answer_id}": {
+        "/api/user-answers/{user_answer_id}": {
             "get": {
                 "tags": [
                     "User Answers"
                 ],
                 "summary": "GetUserAnswer",
-                "operationId": "UserAnswersUserAnswerIdGetUserAnswer",
+                "operationId": "ApiUserAnswersUserAnswerIdGetUserAnswer",
                 "parameters": [
                     {
                         "name": "user_answer_id",
@@ -1131,7 +1131,7 @@
                     "User Answers"
                 ],
                 "summary": "DeleteUserAnswer",
-                "operationId": "UserAnswersUserAnswerIdDeleteUserAnswer",
+                "operationId": "ApiUserAnswersUserAnswerIdDeleteUserAnswer",
                 "parameters": [
                     {
                         "name": "user_answer_id",
@@ -1201,7 +1201,7 @@
                     "User Answers"
                 ],
                 "summary": "PatchUserAnswer",
-                "operationId": "UserAnswersUserAnswerIdPatchUserAnswer",
+                "operationId": "ApiUserAnswersUserAnswerIdPatchUserAnswer",
                 "parameters": [
                     {
                         "name": "user_answer_id",
@@ -1277,13 +1277,13 @@
                 "deprecated": false
             }
         },
-        "/user-answers": {
+        "/api/user-answers": {
             "get": {
                 "tags": [
                     "User Answers"
                 ],
                 "summary": "GetUserAnswers",
-                "operationId": "UserAnswersGetUserAnswers",
+                "operationId": "ApiUserAnswersGetUserAnswers",
                 "responses": {
                     "200": {
                         "description": "Request fulfilled, document follows",
@@ -1307,7 +1307,7 @@
                     "User Answers"
                 ],
                 "summary": "PostUserAnswer",
-                "operationId": "UserAnswersPostUserAnswer",
+                "operationId": "ApiUserAnswersPostUserAnswer",
                 "requestBody": {
                     "content": {
                         "application/json": {
