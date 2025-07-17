@@ -1,0 +1,53 @@
+{
+  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+  "vcs": {
+    "enabled": false,
+    "clientKind": "git",
+    "useIgnoreFile": false,
+    "defaultBranch": "main"
+  },
+  "files": {
+    "ignoreUnknown": true,
+    "ignore": ["frontend/src/client/**/*", "frontend/src/routeTree.gen.ts"],
+    "include": ["frontend/src/**/*", "frontend/index.html", "frontend/*.ts", "frontend/*.js"]
+  },
+  "formatter": {
+    "enabled": true,
+    "indentWidth": 2,
+    "lineWidth": 180,
+    "indentStyle": "space",
+    "formatWithErrors": false,
+    "lineEnding": "lf",
+    "ignore": ["frontend/node_modules/**/*", "dist/**/*", ".venv/**/*", "frontend/public/**/*", "app/**/*", "frontend/src/client/**/*", "frontend/src/routeTree.gen.ts"]
+  },
+  "organizeImports": {
+    "enabled": true,
+    "ignore": ["frontend/node_modules/**/*", "dist/**/*", ".venv/**/*", "frontend/public/**/*", "app/**/*", "frontend/src/client/**/*", "frontend/src/routeTree.gen.ts"]
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": true,
+      "suspicious": {
+        "noExplicitAny": "off"
+      },
+      "complexity": {
+        "noForEach": "off"
+      },
+      "a11y": {
+        "noSvgWithoutTitle": "off"
+      },
+      "nursery": {
+        "useSortedClasses": "warn"
+      }
+    },
+    "ignore": ["frontend/node_modules/**/*", "dist/**/*", ".venv/**/*", "frontend/public/**/*", "app/**/*", "frontend/src/client/**/*", "frontend/src/routeTree.gen.ts"]
+  },
+  "javascript": {
+    "formatter": {
+      "quoteStyle": "double",
+      "jsxQuoteStyle": "double",
+      "semicolons": "asNeeded"
+    }
+  }
+}

@@ -9,7 +9,7 @@ from backend.schema.event import GetEvent, PatchEvent, PostEvent
 
 
 class EventController(Controller):
-    path = "/events"
+    path = "/api/events"
     guards = [admin_user_guard]
     tags = ["Events"]
     dependencies = {

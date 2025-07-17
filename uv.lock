@@ -52,6 +52,7 @@ source = { editable = "." }
 dependencies = [
     { name = "advanced-alchemy" },
     { name = "litestar", extra = ["jwt", "standard"] },
+    { name = "litestar-vite" },
     { name = "pre-commit" },
     { name = "psycopg", extra = ["binary", "pool"] },
     { name = "python-dotenv" },
@@ -61,6 +62,7 @@ dependencies = [
 requires-dist = [
     { name = "advanced-alchemy", specifier = ">=1.4.5" },
     { name = "litestar", extras = ["jwt", "standard"], specifier = ">=2.16.0" },
+    { name = "litestar-vite", specifier = ">=0.13.2" },
     { name = "pre-commit", specifier = ">=4.2.0" },
     { name = "psycopg", extras = ["binary", "pool"], specifier = ">=3.2.9" },
     { name = "python-dotenv", specifier = ">=1.1.1" },
@@ -394,6 +396,9 @@ wheels = [
 ]
 
 [package.optional-dependencies]
+jinja = [
+    { name = "jinja2" },
+]
 jwt = [
     { name = "cryptography" },
     { name = "pyjwt" },
@@ -413,6 +418,18 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/3f/b9/7e296aa1adada25cce8e5f89a996b0e38d852d93b1b656a2058226c542a2/litestar_htmx-0.5.0.tar.gz", hash = "sha256:e02d1a3a92172c874835fa3e6749d65ae9fc626d0df46719490a16293e2146fb", size = 119755, upload-time = "2025-06-11T21:19:45.573Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/f2/24/8d99982f0aa9c1cd82073c6232b54a0dbe6797c7d63c0583a6c68ee3ddf2/litestar_htmx-0.5.0-py3-none-any.whl", hash = "sha256:92833aa47e0d0e868d2a7dbfab75261f124f4b83d4f9ad12b57b9a68f86c50e6", size = 9970, upload-time = "2025-06-11T21:19:44.465Z" },
+]
+
+[[package]]
+name = "litestar-vite"
+version = "0.13.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "litestar", extra = ["jinja"] },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/6c/6f/450287a0c9c47d72938fcb7bf003021a662b373d2d0aba51f7fa9be2604b/litestar_vite-0.13.2.tar.gz", hash = "sha256:b7bf6b861955580f22a584a10e1cbf048b3a15989cc172908ee76ba934bc4540", size = 61137, upload-time = "2025-05-05T13:39:47.317Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/51/17/bcc7b1c1d79c3bc61a30cf6db9323955b52e6045d14b78897efb81eb81ef/litestar_vite-0.13.2-py3-none-any.whl", hash = "sha256:726aa191ad8851c848d80902f7ca25e5c8db08369d8c5b6c20a4e4a1abd0abbe", size = 34875, upload-time = "2025-05-05T13:39:45.4Z" },
 ]
 
 [[package]]

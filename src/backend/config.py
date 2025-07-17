@@ -10,6 +10,7 @@ from litestar.plugins.sqlalchemy import (
     SQLAlchemyPlugin,
 )
 from litestar.security.jwt import JWTCookieAuth, Token
+from litestar_vite import ViteConfig, VitePlugin
 
 from backend.lib.dependencies import provide_user_service
 from backend.models import User
@@ -55,4 +56,21 @@ jwt_cookie_auth = JWTCookieAuth[User](
     exclude=["/schema"],
     samesite="strict",
     secure=True,
+)
+
+
+# Vite
+vite_plugin = VitePlugin(
+    config=ViteConfig(
+        bundle_dir=settings.vite.bundle_dir,
+        asset_url=settings.vite.asset_url,
+        root_dir=settings.vite.root_dir,
+        resource_dir=settings.vite.resource_dir,
+        use_server_lifespan=settings.vite.use_server_lifespan,
+        dev_mode=settings.debug,
+        hot_reload=settings.vite.hot_reload,
+        port=settings.vite.port,
+        host=settings.vite.host,
+        is_react=True,
+    ),
 )

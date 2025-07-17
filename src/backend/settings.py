@@ -9,6 +9,26 @@ console = get_console()
 
 
 @dataclass
+class ViteSettings:
+    use_server_lifespan: bool = field(
+        default_factory=lambda: os.getenv("VITE_USE_SERVER_LIFESPAN", "false").lower() in {"true", "1", "yes"},
+    )
+    host: str = field(
+        default_factory=lambda: os.getenv("VITE_HOST", "0.0.0.0"),  # noqa: S104
+    )
+    port: int = field(
+        default_factory=lambda: int(os.getenv("VITE_PORT", "8080")),
+    )
+    hot_reload: bool = field(
+        default_factory=lambda: os.getenv("VITE_HOT_RELOAD", "false").lower() in {"true", "1", "yes"},
+    )
+    root_dir: Path = Path(__file__).parent.parent / "frontend"
+    resource_dir: Path = Path(__file__).parent.parent / "frontend" / "src"
+    bundle_dir: Path = Path(__file__).parent / "web"
+    asset_url: Path = "/static"
+
+
+@dataclass
 class Settings:
     debug: bool = field(
         default_factory=lambda: os.getenv("DEBUG", "false").lower() in {"true", "1", "yes"},
@@ -19,6 +39,7 @@ class Settings:
     secret_key: str = field(
         default_factory=lambda: os.getenv("SECRET_KEY"),
     )
+    vite: ViteSettings = field(default_factory=ViteSettings)
 
     def __post_init__(self) -> None: ...
 

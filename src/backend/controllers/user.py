@@ -1,6 +1,7 @@
 from litestar import delete, get, patch, post
 from litestar.controller import Controller
 from litestar.di import Provide
+from litestar.exceptions import PermissionDeniedException
 
 from backend.lib.dependencies import provide_event_service, provide_user_service
 from backend.lib.services import EventService, UserService
@@ -9,7 +10,7 @@ from backend.schema.user import GetUser, PatchUser, PostUser
 
 
 class UserController(Controller):
-    path = "/users"
+    path = "/api/users"
     tags = ["Users"]
     dependencies = {
         "user_service": Provide(provide_user_service),
@@ -24,6 +25,11 @@ class UserController(Controller):
         event_service: EventService,
     ) -> GetUser:
         event = await event_service.get_one(code=data.event_code)
+
+        whitelist = event.whitelist.get("emails", [])
+
+        if data.email not in whitelist:
+            raise PermissionDeniedException
 
         user = await user_service.create(
             data={

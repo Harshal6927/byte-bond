@@ -9,7 +9,7 @@ from backend.schema.question import GetQuestion, PatchQuestion, PostQuestion
 
 
 class QuestionController(Controller):
-    path = "/questions"
+    path = "/api/questions"
     guards = [admin_user_guard]
     tags = ["Questions"]
     dependencies = {
