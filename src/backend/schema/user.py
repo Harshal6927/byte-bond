@@ -4,12 +4,14 @@ from typing import Annotated
 from msgspec import UNSET, Meta, Struct, UnsetType
 
 from backend.models import UserStatus
+from backend.schema.user_answer import PostUserAnswer
 
 
 class PostUser(Struct):
     name: Annotated[str, Meta(min_length=1)]
     email: Annotated[str, Meta(min_length=1)]
     event_code: Annotated[str, Meta(min_length=1, max_length=64)]
+    user_answer: list[PostUserAnswer]
 
 
 class GetUser(Struct):

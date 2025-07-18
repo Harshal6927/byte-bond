@@ -10,6 +10,7 @@ from litestar.plugins.sqlalchemy import (
     SQLAlchemyPlugin,
 )
 from litestar.security.jwt import JWTCookieAuth, Token
+from litestar_saq import CronJob, QueueConfig, SAQConfig, SAQPlugin
 from litestar_vite import ViteConfig, VitePlugin
 
 from backend.lib.dependencies import provide_user_service
@@ -53,7 +54,7 @@ jwt_cookie_auth = JWTCookieAuth[User](
     retrieve_user_handler=_retrieve_user_handler,
     token_secret=settings.secret_key,
     default_token_expiration=timedelta(days=1),
-    exclude=["/schema"],
+    exclude=["/schema", "/web", "/saq"],
     samesite="strict",
     secure=True,
 )
@@ -72,5 +73,30 @@ vite_plugin = VitePlugin(
         port=settings.vite.port,
         host=settings.vite.host,
         is_react=True,
+    ),
+)
+
+# SAQ
+saq_plugin = SAQPlugin(
+    config=SAQConfig(
+        web_enabled=settings.debug,
+        use_server_lifespan=True,
+        queue_configs=[
+            QueueConfig(
+                dsn=settings.get_conn_string_without_adaptor(),
+                name="process_game",
+                broker_options={
+                    "manage_pool_lifecycle": True,
+                },
+                scheduled_tasks=[
+                    CronJob(
+                        function="backend.lib.game.process_game",
+                        cron="* * * * *",
+                        timeout=60,
+                        ttl=2000,
+                    ),
+                ],
+            ),
+        ],
     ),
 )

@@ -2,6 +2,7 @@
 authors = [{ name = "Harshal Laheri", email = "harshal@harshallaheri.me" }]
 dependencies = [
     "advanced-alchemy>=1.4.5",
+    "litestar-saq>=0.5.3",
     "litestar-vite>=0.13.2",
     "litestar[jwt,standard]>=2.16.0",
     "pre-commit>=4.2.0",

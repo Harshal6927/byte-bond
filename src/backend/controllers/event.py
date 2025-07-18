@@ -1,11 +1,14 @@
 from litestar import delete, get, patch, post
 from litestar.controller import Controller
 from litestar.di import Provide
+from litestar.exceptions import PermissionDeniedException
 
-from backend.lib.dependencies import provide_event_service
-from backend.lib.services import EventService
+from backend.lib.dependencies import provide_event_service, provide_question_service
+from backend.lib.services import EventService, QuestionService
 from backend.lib.utils import admin_user_guard
 from backend.schema.event import GetEvent, PatchEvent, PostEvent
+
+MINIMUM_QUESTIONS_REQUIRED = 6
 
 
 class EventController(Controller):
@@ -14,6 +17,7 @@ class EventController(Controller):
     tags = ["Events"]
     dependencies = {
         "event_service": Provide(provide_event_service),
+        "question_service": Provide(provide_question_service),
     }
 
     @post()
@@ -21,7 +25,14 @@ class EventController(Controller):
         self,
         data: PostEvent,
         event_service: EventService,
+        question_service: QuestionService,
     ) -> GetEvent:
+        questions = await question_service.list()
+
+        if len(questions) < MINIMUM_QUESTIONS_REQUIRED:
+            msg = f"At least {MINIMUM_QUESTIONS_REQUIRED} questions are required to create an event."
+            raise PermissionDeniedException(detail=msg)
+
         event = await event_service.create(data)
         return event_service.to_schema(event, schema_type=GetEvent)
 

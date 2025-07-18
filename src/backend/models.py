@@ -32,7 +32,7 @@ class Event(BigIntAuditBase):
 
     name: Mapped[str]
     code: Mapped[str] = mapped_column(unique=True, index=True)
-    is_active: Mapped[bool] = mapped_column(default=False)  # True if the event is currently active for connections
+    is_active: Mapped[bool] = mapped_column(default=False)
     whitelist: Mapped[dict] = mapped_column(JSONB, default={})  # Whitelisted email should in a list with key "emails"
 
     # -----------------
@@ -157,8 +157,8 @@ class Connection(BigIntAuditBase):
     )
     status: Mapped[ConnectionStatus] = mapped_column(default=ConnectionStatus.PENDING)
     event_id: Mapped[int] = mapped_column(ForeignKey("events.id", ondelete="CASCADE"))
-    user1_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))  # User who presents the QR code
-    user2_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))  # User who scans the QR code
+    user1_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))  # Presents the QR code
+    user2_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))  # Scans the QR code
 
     # -----------------
     # ORM Relationships
@@ -182,8 +182,9 @@ class ConnectionQuestion(BigIntAuditBase):
         UniqueConstraint("connection_id", "question_id", name="uq_connection_question"),
     )
 
-    user1_correct: Mapped[bool] = mapped_column()
-    user2_correct: Mapped[bool] = mapped_column()
+    question_answered: Mapped[bool] = mapped_column(default=False)
+    answered_correctly: Mapped[bool] = mapped_column(default=False)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
     connection_id: Mapped[int] = mapped_column(ForeignKey("connections.id", ondelete="CASCADE"))
     question_id: Mapped[int] = mapped_column(ForeignKey("questions.id", ondelete="CASCADE"))
 
@@ -195,7 +196,4 @@ class ConnectionQuestion(BigIntAuditBase):
     question: Mapped["Question"] = relationship(back_populates="connection_questions")
 
     def __repr__(self):
-        return (
-            f"<ConnectionQuestion(conn_id={self.connection_id}, q_id={self.question_id}, "
-            f"u1_corr={self.user1_correct}, u2_corr={self.user2_correct})>"
-        )
+        return f"<ConnectionQuestion(id={self.id}, question_answered={self.question_answered}, answered_correctly={self.answered_correctly}, user_id={self.user_id}, connection_id={self.connection_id}, question_id={self.question_id})>"  # noqa: E501

@@ -43,6 +43,12 @@ class Settings:
 
     def __post_init__(self) -> None: ...
 
+    def get_conn_string_without_adaptor(self) -> str | None:
+        if not self.db_connection_string:
+            return None
+
+        return self.db_connection_string.replace("+psycopg", "")
+
     @classmethod
     def from_env(cls, dotenv_filename: str) -> "Settings":
         env_file = (

@@ -10,13 +10,12 @@ from backend.schema.question import GetQuestion, PatchQuestion, PostQuestion
 
 class QuestionController(Controller):
     path = "/api/questions"
-    guards = [admin_user_guard]
     tags = ["Questions"]
     dependencies = {
         "question_service": Provide(provide_question_service),
     }
 
-    @post()
+    @post(guards=[admin_user_guard])
     async def post_question(
         self,
         data: PostQuestion,
@@ -25,7 +24,7 @@ class QuestionController(Controller):
         question = await question_service.create(data)
         return question_service.to_schema(question, schema_type=GetQuestion)
 
-    @get()
+    @get(exclude_from_auth=True)
     async def get_questions(
         self,
         question_service: QuestionService,
@@ -33,7 +32,7 @@ class QuestionController(Controller):
         questions = await question_service.list()
         return question_service.to_schema(questions, schema_type=GetQuestion)
 
-    @get("/{question_id:int}")
+    @get("/{question_id:int}", exclude_from_auth=True)
     async def get_question(
         self,
         question_id: int,
@@ -42,7 +41,7 @@ class QuestionController(Controller):
         question = await question_service.get(question_id)
         return question_service.to_schema(question, schema_type=GetQuestion)
 
-    @patch("/{question_id:int}")
+    @patch("/{question_id:int}", guards=[admin_user_guard])
     async def patch_question(
         self,
         question_id: int,
@@ -55,7 +54,7 @@ class QuestionController(Controller):
         )
         return question_service.to_schema(question, schema_type=GetQuestion)
 
-    @delete("/{question_id:int}", status_code=200)
+    @delete("/{question_id:int}", guards=[admin_user_guard], status_code=200)
     async def delete_question(
         self,
         question_id: int,

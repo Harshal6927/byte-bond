@@ -1,10 +1,15 @@
-from litestar import delete, get, patch, post
+from litestar import Request, delete, get, patch, post
 from litestar.controller import Controller
 from litestar.di import Provide
-from litestar.exceptions import PermissionDeniedException
+from litestar.exceptions import NotAuthorizedException, PermissionDeniedException
 
-from backend.lib.dependencies import provide_event_service, provide_user_service
-from backend.lib.services import EventService, UserService
+from backend.lib.dependencies import (
+    provide_event_service,
+    provide_question_service,
+    provide_user_answer_service,
+    provide_user_service,
+)
+from backend.lib.services import EventService, QuestionService, UserAnswerService, UserService
 from backend.lib.utils import admin_user_guard
 from backend.schema.user import GetUser, PatchUser, PostUser
 
@@ -15,6 +20,8 @@ class UserController(Controller):
     dependencies = {
         "user_service": Provide(provide_user_service),
         "event_service": Provide(provide_event_service),
+        "question_service": Provide(provide_question_service),
+        "user_answer_service": Provide(provide_user_answer_service),
     }
 
     @post(exclude_from_auth=True)
@@ -23,6 +30,8 @@ class UserController(Controller):
         data: PostUser,
         user_service: UserService,
         event_service: EventService,
+        question_service: QuestionService,
+        user_answer_service: UserAnswerService,
     ) -> GetUser:
         event = await event_service.get_one(code=data.event_code)
 
@@ -30,6 +39,13 @@ class UserController(Controller):
 
         if data.email not in whitelist:
             raise PermissionDeniedException
+
+        signup_questions = await question_service.list(is_signup_question=True)
+        signup_questions_ids = {question.id for question in signup_questions}
+        user_answers_questions_ids = {answer.question_id for answer in data.user_answer}
+
+        if user_answers_questions_ids != signup_questions_ids:
+            raise PermissionDeniedException("Please answer all signup questions.")
 
         user = await user_service.create(
             data={
@@ -39,9 +55,20 @@ class UserController(Controller):
             },
         )
 
+        await user_answer_service.create_many(
+            [
+                {
+                    "answer": answer.answer,
+                    "user_id": user.id,
+                    "question_id": answer.question_id,
+                }
+                for answer in data.user_answer
+            ],
+        )
+
         return user_service.to_schema(user, schema_type=GetUser)
 
-    @get()
+    @get(guards=[admin_user_guard])
     async def get_users(
         self,
         user_service: UserService,
@@ -49,7 +76,7 @@ class UserController(Controller):
         users = await user_service.list()
         return user_service.to_schema(users, schema_type=GetUser)
 
-    @get("/{user_id:int}")
+    @get("/{user_id:int}", guards=[admin_user_guard])
     async def get_user(
         self,
         user_id: int,
@@ -64,7 +91,11 @@ class UserController(Controller):
         user_id: int,
         data: PatchUser,
         user_service: UserService,
+        request: Request,
     ) -> GetUser:
+        if request.user.id != user_id and not request.user.is_admin:
+            raise NotAuthorizedException
+
         user = await user_service.update(
             item_id=user_id,
             data=data,
