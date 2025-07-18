@@ -30,3 +30,14 @@ class GameStatus(Struct):
 
 class QRScanRequest(Struct):
     qr_code: Annotated[str, Meta(min_length=1)]
+
+
+class GameQuestionResponse(Struct):
+    question_id: Annotated[int, Meta(gt=0)]
+    answer: Annotated[str, Meta(min_length=1)]
+
+
+class QuestionResult(Struct):
+    correct: bool
+    expected_answer: str
+    your_answer: str

@@ -1,9 +1,9 @@
 import random
 
-from litestar import Request, get, post
+from litestar import Request, get, post, status_codes
 from litestar.controller import Controller
 from litestar.di import Provide
-from litestar.exceptions import NotAuthorizedException
+from litestar.exceptions import HTTPException, NotAuthorizedException
 
 from backend.lib.dependencies import (
     provide_connection_question_service,
@@ -24,10 +24,12 @@ from backend.models import Connection, ConnectionQuestion, ConnectionStatus, Que
 from backend.schema.event import GetEvent
 from backend.schema.game import (
     ConnectionQuestionData,
+    GameQuestionResponse,
     GameStartRequest,
     GameStatus,
     GameStopRequest,
     QRScanRequest,
+    QuestionResult,
 )
 
 GAME_QUESTIONS_COUNT = 6
@@ -128,6 +130,93 @@ class GameController(Controller):
             qr_code=qr_code,
             partner_name=partner_name,
             connection_questions=connection_questions,
+        )
+
+    @post("/answer-question")
+    async def answer_question(
+        self,
+        data: GameQuestionResponse,
+        request: Request,
+        connection_service: ConnectionService,
+        connection_question_service: ConnectionQuestionService,
+        user_service: UserService,
+    ) -> QuestionResult:
+        user: User = request.user
+
+        # Get user's current active connection
+        current_connection: Connection = await self._get_user_active_connection(
+            user_id=user.id,
+            event_id=user.event_id,
+            connection_service=connection_service,
+        )
+        if not current_connection or current_connection.status != ConnectionStatus.ACTIVE:
+            raise HTTPException(
+                status_code=status_codes.HTTP_400_BAD_REQUEST,
+                detail="No active connection found",
+            )
+
+        # Verify this user is assigned to answer this question
+        conn_question = await connection_question_service.get_one_or_none(
+            connection_id=current_connection.id,
+            question_id=data.question_id,
+            user_id=user.id,
+        )
+        if not conn_question:
+            raise HTTPException(
+                status_code=status_codes.HTTP_400_BAD_REQUEST,
+                detail="You are not assigned to answer this question",
+            )
+
+        # Check if question was already answered
+        if conn_question.question_answered:
+            raise HTTPException(
+                status_code=status_codes.HTTP_400_BAD_REQUEST,
+                detail="Question already answered",
+            )
+
+        # Get the other user's answer to this question
+        other_user_id = (
+            current_connection.user2_id if current_connection.user1_id == user.id else current_connection.user1_id
+        )
+        other_user = await user_service.get(other_user_id)
+
+        other_user_answer = None
+        for answer in other_user.answers:
+            if answer.question_id == data.question_id:
+                other_user_answer = answer.answer
+                break
+
+        if not other_user_answer:
+            raise HTTPException(
+                status_code=status_codes.HTTP_404_NOT_FOUND,
+                detail="Other user hasn't answered this question during signup",
+            )
+
+        # Check if answer is correct (case-insensitive comparison)
+        is_correct = data.answer.lower().strip() == other_user_answer.lower().strip()
+
+        # Update the connection question
+        await connection_question_service.update(
+            item_id=conn_question.id,
+            data={
+                "question_answered": True,
+                "answered_correctly": is_correct,
+            },
+        )
+
+        # Award points to both users if correct
+        if is_correct:
+            await user_service.update_many(
+                data=[
+                    {"id": user.id, "points": user.points + 1},
+                    {"id": other_user.id, "points": other_user.points + 1},
+                ],
+            )
+
+        return QuestionResult(
+            correct=is_correct,
+            expected_answer=other_user_answer,
+            your_answer=data.answer,
         )
 
     @post("/scan-qr")
