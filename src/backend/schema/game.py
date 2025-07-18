@@ -13,10 +13,19 @@ class GameStopRequest(Struct):
     event_id: Annotated[int, Meta(gt=0)]
 
 
+class ConnectionQuestionData(Struct):
+    id: int
+    question_id: int
+    question_text: str
+    question_answered: bool
+    answered_correctly: bool
+
+
 class GameStatus(Struct):
     user_status: UserStatus
     qr_code: str | None
     partner_name: str | None
+    connection_questions: list[ConnectionQuestionData] | None
 
 
 class QRScanRequest(Struct):

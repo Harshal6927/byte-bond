@@ -1,3 +1,5 @@
+import random
+
 from litestar import Request, get, post
 from litestar.controller import Controller
 from litestar.di import Provide
@@ -10,16 +12,25 @@ from backend.lib.dependencies import (
     provide_question_service,
     provide_user_service,
 )
-from backend.lib.services import ConnectionService, EventService, UserService
+from backend.lib.services import (
+    ConnectionQuestionService,
+    ConnectionService,
+    EventService,
+    QuestionService,
+    UserService,
+)
 from backend.lib.utils import admin_user_guard
-from backend.models import Connection, ConnectionStatus, User, UserStatus
+from backend.models import Connection, ConnectionQuestion, ConnectionStatus, Question, User, UserStatus
 from backend.schema.event import GetEvent
 from backend.schema.game import (
+    ConnectionQuestionData,
     GameStartRequest,
     GameStatus,
     GameStopRequest,
     QRScanRequest,
 )
+
+GAME_QUESTIONS_COUNT = 6
 
 
 class GameController(Controller):
@@ -78,7 +89,9 @@ class GameController(Controller):
         self,
         request: Request,
         user_service: UserService,
+        question_service: QuestionService,
         connection_service: ConnectionService,
+        connection_question_service: ConnectionQuestionService,
     ) -> GameStatus:
         user: User = request.user
 
@@ -102,10 +115,19 @@ class GameController(Controller):
             )
             partner_name = partner.name
 
+            # Get connection questions data for the current user
+            connection_questions = await self._get_user_connection_questions(
+                user_id=user.id,
+                connection_id=current_connection.id,
+                connection_question_service=connection_question_service,
+                question_service=question_service,
+            )
+
         return GameStatus(
             user_status=user.status,
             qr_code=qr_code,
             partner_name=partner_name,
+            connection_questions=connection_questions,
         )
 
     @post("/scan-qr")
@@ -113,8 +135,10 @@ class GameController(Controller):
         self,
         data: QRScanRequest,
         request: Request,
-        connection_service: ConnectionService,
         user_service: UserService,
+        connection_service: ConnectionService,
+        question_service: QuestionService,
+        connection_question_service: ConnectionQuestionService,
     ) -> None:
         user: User = request.user
 
@@ -147,6 +171,95 @@ class GameController(Controller):
                 {"id": current_connection.user2_id, "status": UserStatus.BUSY},
             ],
         )
+
+        # Create connection question records for both users
+        await self._create_connection_questions(
+            user1_id=current_connection.user1_id,
+            user2_id=current_connection.user2_id,
+            connection_id=current_connection.id,
+            question_service=question_service,
+            connection_question_service=connection_question_service,
+        )
+
+    async def _get_user_connection_questions(
+        self,
+        user_id: int,
+        connection_id: int,
+        connection_question_service: ConnectionQuestionService,
+        question_service: QuestionService,
+    ) -> list[ConnectionQuestionData]:
+        # Get connection questions for this user in this connection
+        user_connection_questions = await connection_question_service.list(
+            ConnectionQuestion.user_id == user_id,
+            ConnectionQuestion.connection_id == connection_id,
+        )
+
+        if not user_connection_questions:
+            return []
+
+        # Get question details for each connection question
+        question_ids = [cq.question_id for cq in user_connection_questions]
+        questions = await question_service.list(Question.id.in_(question_ids))
+
+        # Create a mapping of question_id to question text
+        question_map = {q.id: q.question for q in questions}
+
+        return [
+            ConnectionQuestionData(
+                id=cq.id,
+                question_id=cq.question_id,
+                question_text=question_map.get(cq.question_id, "Error: Unknown Question"),
+                question_answered=cq.question_answered,
+                answered_correctly=cq.answered_correctly,
+            )
+            for cq in user_connection_questions
+        ]
+
+    async def _create_connection_questions(
+        self,
+        user1_id: int,
+        user2_id: int,
+        connection_id: int,
+        question_service: QuestionService,
+        connection_question_service: ConnectionQuestionService,
+    ) -> None:
+        # Get all available game questions
+        available_questions = await question_service.list(Question.is_game_question.is_(True))
+
+        if len(available_questions) < GAME_QUESTIONS_COUNT:
+            raise ValueError("Not enough game questions available. Need at least 6 questions.")
+
+        # Randomly select questions from available questions
+        selected_questions = random.sample(available_questions, GAME_QUESTIONS_COUNT)
+
+        # Randomly assign questions to each user
+        random.shuffle(selected_questions)
+        user1_questions = selected_questions[: GAME_QUESTIONS_COUNT // 2]
+        user2_questions = selected_questions[GAME_QUESTIONS_COUNT // 2 :]
+
+        # Create connection question records
+        connection_questions_data = [
+            {
+                "question_answered": False,
+                "answered_correctly": False,
+                "user_id": user1_id,
+                "connection_id": connection_id,
+                "question_id": question.id,
+            }
+            for question in user1_questions
+        ]
+        connection_questions_data.extend(
+            {
+                "question_answered": False,
+                "answered_correctly": False,
+                "user_id": user2_id,
+                "connection_id": connection_id,
+                "question_id": question.id,
+            }
+            for question in user2_questions
+        )
+
+        await connection_question_service.create_many(connection_questions_data)
 
     async def _get_user_active_connection(
         self,
