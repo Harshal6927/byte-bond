@@ -78,11 +78,13 @@ class GameController(Controller):
                 {"id": conn.id, "status": ConnectionStatus.CANCELLED},
             )
             user_data.extend(
-                {"id": conn.user1_id, "status": UserStatus.AVAILABLE},
-                {"id": conn.user2_id, "status": UserStatus.AVAILABLE},
+                [
+                    {"id": conn.user1_id, "status": UserStatus.AVAILABLE},
+                    {"id": conn.user2_id, "status": UserStatus.AVAILABLE},
+                ],
             )
-        await connection_service.update(connection_data)
-        await user_service.update(user_data)
+        await connection_service.update_many(connection_data)
+        await user_service.update_many(user_data)
 
         return event_service.to_schema(event, schema_type=GetEvent)
 
@@ -105,6 +107,7 @@ class GameController(Controller):
         )
         qr_code = None
         partner_name = None
+        connection_questions = None
 
         if current_connection:
             # Determine if user should show QR code (user1) or scan (user2)
@@ -130,6 +133,57 @@ class GameController(Controller):
             qr_code=qr_code,
             partner_name=partner_name,
             connection_questions=connection_questions,
+        )
+
+    @post("/scan-qr")
+    async def scan_qr_code(
+        self,
+        data: QRScanRequest,
+        request: Request,
+        user_service: UserService,
+        connection_service: ConnectionService,
+        question_service: QuestionService,
+        connection_question_service: ConnectionQuestionService,
+    ) -> None:
+        user: User = request.user
+
+        # Get user's current active connection
+        current_connection = await self._get_user_active_connection(
+            user_id=user.id,
+            event_id=user.event_id,
+            connection_service=connection_service,
+        )
+
+        # Check if logged in user is user1 (QR giver)
+        if not current_connection or current_connection.user1_id == user.id:
+            raise NotAuthorizedException
+
+        # Verify the QR code matches user1's QR code
+        user1 = await user_service.get(current_connection.user1_id)
+        if user1.qr_code != data.qr_code:
+            raise NotAuthorizedException(detail="Invalid QR code scanned")
+
+        # Activate the connection
+        await connection_service.update(
+            item_id=current_connection.id,
+            data={"status": ConnectionStatus.ACTIVE},
+        )
+
+        # Set both users to busy status
+        await user_service.update_many(
+            [
+                {"id": current_connection.user1_id, "status": UserStatus.BUSY},
+                {"id": current_connection.user2_id, "status": UserStatus.BUSY},
+            ],
+        )
+
+        # Create connection question records for both users
+        await self._create_connection_questions(
+            user1_id=current_connection.user1_id,
+            user2_id=current_connection.user2_id,
+            connection_id=current_connection.id,
+            question_service=question_service,
+            connection_question_service=connection_question_service,
         )
 
     @post("/answer-question")
@@ -219,15 +273,13 @@ class GameController(Controller):
             your_answer=data.answer,
         )
 
-    @post("/scan-qr")
-    async def scan_qr_code(
+    @post("/complete-connection")
+    async def complete_connection(
         self,
-        data: QRScanRequest,
         request: Request,
-        user_service: UserService,
         connection_service: ConnectionService,
-        question_service: QuestionService,
         connection_question_service: ConnectionQuestionService,
+        user_service: UserService,
     ) -> None:
         user: User = request.user
 
@@ -238,40 +290,53 @@ class GameController(Controller):
             connection_service=connection_service,
         )
 
-        # Check if logged in user is user1 (QR giver)
-        if not current_connection or current_connection.user1_id == user.id:
-            raise NotAuthorizedException
+        if not current_connection or current_connection.status != ConnectionStatus.ACTIVE:
+            raise HTTPException(
+                status_code=status_codes.HTTP_404_NOT_FOUND,
+                detail="No active connection found",
+            )
 
-        # Verify the QR code matches user1's QR code
-        user1 = await user_service.get(current_connection.user1_id)
-        if user1.qr_code != data.qr_code:
-            raise NotAuthorizedException(detail="Invalid QR code scanned")
+        # Check if all connection questions are answered
+        all_connection_questions = await connection_question_service.list(
+            ConnectionQuestion.connection_id == current_connection.id,
+        )
 
-        # Activate the connection
+        unanswered_questions = [cq for cq in all_connection_questions if not cq.question_answered]
+
+        if unanswered_questions:
+            raise HTTPException(
+                status_code=status_codes.HTTP_400_BAD_REQUEST,
+                detail=f"{len(unanswered_questions)} questions still unanswered",
+            )
+
+        # Complete the connection
         await connection_service.update(
             item_id=current_connection.id,
-            data={"status": ConnectionStatus.ACTIVE},
+            data={"status": ConnectionStatus.COMPLETED},
         )
 
-        # Set both users to busy status
+        # Update connection counts and set users back to available
+        user1 = await user_service.get(current_connection.user1_id)
+        user2 = await user_service.get(current_connection.user2_id)
+
         await user_service.update_many(
-            [
-                {"id": current_connection.user1_id, "status": UserStatus.BUSY},
-                {"id": current_connection.user2_id, "status": UserStatus.BUSY},
+            data=[
+                {
+                    "id": current_connection.user1_id,
+                    "status": UserStatus.AVAILABLE,
+                    "connection_count": user1.connection_count + 1,
+                },
+                {
+                    "id": current_connection.user2_id,
+                    "status": UserStatus.AVAILABLE,
+                    "connection_count": user2.connection_count + 1,
+                },
             ],
-        )
-
-        # Create connection question records for both users
-        await self._create_connection_questions(
-            user1_id=current_connection.user1_id,
-            user2_id=current_connection.user2_id,
-            connection_id=current_connection.id,
-            question_service=question_service,
-            connection_question_service=connection_question_service,
         )
 
     async def _get_user_connection_questions(
         self,
+        *,
         user_id: int,
         connection_id: int,
         connection_question_service: ConnectionQuestionService,
@@ -306,6 +371,7 @@ class GameController(Controller):
 
     async def _create_connection_questions(
         self,
+        *,
         user1_id: int,
         user2_id: int,
         connection_id: int,
@@ -336,8 +402,7 @@ class GameController(Controller):
                 "question_id": question.id,
             }
             for question in user1_questions
-        ]
-        connection_questions_data.extend(
+        ] + [
             {
                 "question_answered": False,
                 "answered_correctly": False,
@@ -346,12 +411,13 @@ class GameController(Controller):
                 "question_id": question.id,
             }
             for question in user2_questions
-        )
+        ]
 
         await connection_question_service.create_many(connection_questions_data)
 
     async def _get_user_active_connection(
         self,
+        *,
         user_id: int,
         event_id: int | None,
         connection_service: ConnectionService,

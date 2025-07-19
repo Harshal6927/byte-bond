@@ -31,8 +31,10 @@ async def _create_connection(user_service: UserService, connection_service: Conn
         )
 
         update_users.extend(
-            {"id": user1.id, "status": UserStatus.CONNECTING},
-            {"id": user2.id, "status": UserStatus.CONNECTING},
+            [
+                {"id": user1.id, "status": UserStatus.CONNECTING},
+                {"id": user2.id, "status": UserStatus.CONNECTING},
+            ],
         )
 
     await connection_service.create_many(new_connections)
