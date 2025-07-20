@@ -1,3 +1,4 @@
+from advanced_alchemy.service.pagination import OffsetPagination
 from litestar import Request, delete, get, patch, post
 from litestar.controller import Controller
 from litestar.di import Provide
@@ -37,9 +38,17 @@ class UserAnswerController(Controller):
         self,
         user_answer_service: UserAnswerService,
         request: Request,
-    ) -> list[GetUserAnswer]:
+    ) -> OffsetPagination[GetUserAnswer]:
         # User can only see their own answers
         user_answers = await user_answer_service.list(user_id=request.user.id)
+        return user_answer_service.to_schema(user_answers, schema_type=GetUserAnswer)
+
+    @get("/all", guards=[admin_user_guard])
+    async def get_all_user_answers(
+        self,
+        user_answer_service: UserAnswerService,
+    ) -> OffsetPagination[GetUserAnswer]:
+        user_answers = await user_answer_service.list()
         return user_answer_service.to_schema(user_answers, schema_type=GetUserAnswer)
 
     @get("/{user_answer_id:int}")

@@ -1,3 +1,5 @@
+import { Skeleton } from "@/components/ui/skeleton"
+import { useUser } from "@/components/user-context"
 import { Link, Outlet, createFileRoute } from "@tanstack/react-router"
 
 export const Route = createFileRoute("/_app")({
@@ -5,11 +7,15 @@ export const Route = createFileRoute("/_app")({
 })
 
 function AppLayout() {
+  const { user, logout } = useUser()
+
+  if (!user) {
+    return <Skeleton className="flex min-h-screen items-center justify-center">Authenticating...</Skeleton>
+  }
+
   return (
     <>
-      <nav>
-        <Link to="/login">Login</Link>
-      </nav>
+      <nav>Nav</nav>
       <main>
         <Outlet />
       </main>

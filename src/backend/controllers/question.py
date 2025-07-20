@@ -1,3 +1,4 @@
+from advanced_alchemy.service.pagination import OffsetPagination
 from litestar import delete, get, patch, post
 from litestar.controller import Controller
 from litestar.di import Provide
@@ -28,7 +29,7 @@ class QuestionController(Controller):
     async def get_questions(
         self,
         question_service: QuestionService,
-    ) -> list[GetQuestion]:
+    ) -> OffsetPagination[GetQuestion]:
         questions = await question_service.list()
         return question_service.to_schema(questions, schema_type=GetQuestion)
 

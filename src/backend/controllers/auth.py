@@ -1,5 +1,6 @@
 from litestar import Request, Response, get, post
 from litestar.controller import Controller
+from litestar.datastructures import Cookie
 from litestar.di import Provide
 
 from backend.config import jwt_cookie_auth
@@ -34,6 +35,13 @@ class AuthController(Controller):
         return jwt_cookie_auth.login(
             identifier=str(user.id),
             send_token_as_response_body=True,
+        )
+
+    @get("/logout", exclude_from_auth=True)
+    async def logout(self) -> Response:
+        return Response(
+            content=None,
+            cookies=[Cookie(key="token", value=None, expires=0)],
         )
 
     @get("/me")

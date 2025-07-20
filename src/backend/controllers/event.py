@@ -1,3 +1,4 @@
+from advanced_alchemy.service.pagination import OffsetPagination
 from litestar import delete, get, patch, post
 from litestar.controller import Controller
 from litestar.di import Provide
@@ -40,7 +41,7 @@ class EventController(Controller):
     async def get_events(
         self,
         event_service: EventService,
-    ) -> list[GetEvent]:
+    ) -> OffsetPagination[GetEvent]:
         events = await event_service.list()
         return event_service.to_schema(events, schema_type=GetEvent)
 

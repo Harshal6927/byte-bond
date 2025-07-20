@@ -104,6 +104,29 @@
                 "deprecated": false
             }
         },
+        "/api/auth/logout": {
+            "get": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Logout",
+                "operationId": "ApiAuthLogoutLogout",
+                "responses": {
+                    "200": {
+                        "description": "Request fulfilled, document follows",
+                        "headers": {},
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "deprecated": false
+            }
+        },
         "/api/events/{event_id}": {
             "get": {
                 "tags": [
@@ -340,10 +363,27 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "items": {
-                                        "$ref": "#/components/schemas/GetEvent"
+                                    "properties": {
+                                        "items": {
+                                            "items": {
+                                                "$ref": "#/components/schemas/GetEvent"
+                                            },
+                                            "type": "array"
+                                        },
+                                        "limit": {
+                                            "type": "integer",
+                                            "description": "Maximal number of items to send."
+                                        },
+                                        "offset": {
+                                            "type": "integer",
+                                            "description": "Offset from the beginning of the query."
+                                        },
+                                        "total": {
+                                            "type": "integer",
+                                            "description": "Total number of items."
+                                        }
                                     },
-                                    "type": "array"
+                                    "type": "object"
                                 }
                             }
                         }
@@ -416,6 +456,93 @@
                                 }
                             }
                         }
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/api/game/answer-question": {
+            "post": {
+                "tags": [
+                    "Game"
+                ],
+                "summary": "AnswerQuestion",
+                "operationId": "ApiGameAnswerQuestionAnswerQuestion",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/GameQuestionResponse"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "Document created, URL follows",
+                        "headers": {},
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/QuestionResult"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request syntax or unsupported method",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status_code": {
+                                            "type": "integer"
+                                        },
+                                        "detail": {
+                                            "type": "string"
+                                        },
+                                        "extra": {
+                                            "additionalProperties": {},
+                                            "type": [
+                                                "null",
+                                                "object",
+                                                "array"
+                                            ]
+                                        }
+                                    },
+                                    "type": "object",
+                                    "required": [
+                                        "detail",
+                                        "status_code"
+                                    ],
+                                    "description": "Validation Exception",
+                                    "examples": [
+                                        {
+                                            "status_code": 400,
+                                            "detail": "Bad Request",
+                                            "extra": {}
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "deprecated": false
+            }
+        },
+        "/api/game/complete-connection": {
+            "post": {
+                "tags": [
+                    "Game"
+                ],
+                "summary": "CompleteConnection",
+                "operationId": "ApiGameCompleteConnectionCompleteConnection",
+                "responses": {
+                    "201": {
+                        "description": "Document created, URL follows",
+                        "headers": {}
                     }
                 },
                 "deprecated": false
@@ -886,10 +1013,27 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "items": {
-                                        "$ref": "#/components/schemas/GetQuestion"
+                                    "properties": {
+                                        "items": {
+                                            "items": {
+                                                "$ref": "#/components/schemas/GetQuestion"
+                                            },
+                                            "type": "array"
+                                        },
+                                        "limit": {
+                                            "type": "integer",
+                                            "description": "Maximal number of items to send."
+                                        },
+                                        "offset": {
+                                            "type": "integer",
+                                            "description": "Offset from the beginning of the query."
+                                        },
+                                        "total": {
+                                            "type": "integer",
+                                            "description": "Total number of items."
+                                        }
                                     },
-                                    "type": "array"
+                                    "type": "object"
                                 }
                             }
                         }
@@ -1203,10 +1347,27 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "items": {
-                                        "$ref": "#/components/schemas/GetUser"
+                                    "properties": {
+                                        "items": {
+                                            "items": {
+                                                "$ref": "#/components/schemas/GetUser"
+                                            },
+                                            "type": "array"
+                                        },
+                                        "limit": {
+                                            "type": "integer",
+                                            "description": "Maximal number of items to send."
+                                        },
+                                        "offset": {
+                                            "type": "integer",
+                                            "description": "Offset from the beginning of the query."
+                                        },
+                                        "total": {
+                                            "type": "integer",
+                                            "description": "Total number of items."
+                                        }
                                     },
-                                    "type": "array"
+                                    "type": "object"
                                 }
                             }
                         }
@@ -1506,6 +1667,49 @@
                 "deprecated": false
             }
         },
+        "/api/user-answers/all": {
+            "get": {
+                "tags": [
+                    "User Answers"
+                ],
+                "summary": "GetAllUserAnswers",
+                "operationId": "ApiUserAnswersAllGetAllUserAnswers",
+                "responses": {
+                    "200": {
+                        "description": "Request fulfilled, document follows",
+                        "headers": {},
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "items": {
+                                            "items": {
+                                                "$ref": "#/components/schemas/GetUserAnswer"
+                                            },
+                                            "type": "array"
+                                        },
+                                        "limit": {
+                                            "type": "integer",
+                                            "description": "Maximal number of items to send."
+                                        },
+                                        "offset": {
+                                            "type": "integer",
+                                            "description": "Offset from the beginning of the query."
+                                        },
+                                        "total": {
+                                            "type": "integer",
+                                            "description": "Total number of items."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "deprecated": false
+            }
+        },
         "/api/user-answers": {
             "get": {
                 "tags": [
@@ -1520,10 +1724,27 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "items": {
-                                        "$ref": "#/components/schemas/GetUserAnswer"
+                                    "properties": {
+                                        "items": {
+                                            "items": {
+                                                "$ref": "#/components/schemas/GetUserAnswer"
+                                            },
+                                            "type": "array"
+                                        },
+                                        "limit": {
+                                            "type": "integer",
+                                            "description": "Maximal number of items to send."
+                                        },
+                                        "offset": {
+                                            "type": "integer",
+                                            "description": "Offset from the beginning of the query."
+                                        },
+                                        "total": {
+                                            "type": "integer",
+                                            "description": "Total number of items."
+                                        }
                                     },
-                                    "type": "array"
+                                    "type": "object"
                                 }
                             }
                         }
@@ -1604,6 +1825,51 @@
     },
     "components": {
         "schemas": {
+            "ConnectionQuestionData": {
+                "properties": {
+                    "id": {
+                        "type": "integer"
+                    },
+                    "question_id": {
+                        "type": "integer"
+                    },
+                    "question_text": {
+                        "type": "string"
+                    },
+                    "question_answered": {
+                        "type": "boolean"
+                    },
+                    "answered_correctly": {
+                        "type": "boolean"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "answered_correctly",
+                    "id",
+                    "question_answered",
+                    "question_id",
+                    "question_text"
+                ],
+                "title": "ConnectionQuestionData"
+            },
+            "GameQuestionResponse": {
+                "properties": {
+                    "question_id": {
+                        "type": "integer"
+                    },
+                    "answer": {
+                        "type": "string",
+                        "minLength": 1
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "answer",
+                    "question_id"
+                ],
+                "title": "GameQuestionResponse"
+            },
             "GameStartRequest": {
                 "properties": {
                     "event_id": {
@@ -1635,6 +1901,19 @@
                         "oneOf": [
                             {
                                 "type": "string"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "connection_questions": {
+                        "oneOf": [
+                            {
+                                "items": {
+                                    "$ref": "#/components/schemas/ConnectionQuestionData"
+                                },
+                                "type": "array"
                             },
                             {
                                 "type": "null"
@@ -2042,6 +2321,26 @@
                     "qr_code"
                 ],
                 "title": "QRScanRequest"
+            },
+            "QuestionResult": {
+                "properties": {
+                    "correct": {
+                        "type": "boolean"
+                    },
+                    "expected_answer": {
+                        "type": "string"
+                    },
+                    "your_answer": {
+                        "type": "string"
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "correct",
+                    "expected_answer",
+                    "your_answer"
+                ],
+                "title": "QuestionResult"
             },
             "UserStatus": {
                 "type": "string",

@@ -1,3 +1,4 @@
+from advanced_alchemy.service.pagination import OffsetPagination
 from litestar import Request, delete, get, patch, post
 from litestar.controller import Controller
 from litestar.di import Provide
@@ -72,7 +73,7 @@ class UserController(Controller):
     async def get_users(
         self,
         user_service: UserService,
-    ) -> list[GetUser]:
+    ) -> OffsetPagination[GetUser]:
         users = await user_service.list()
         return user_service.to_schema(users, schema_type=GetUser)
 
