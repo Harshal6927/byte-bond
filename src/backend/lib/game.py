@@ -12,6 +12,7 @@ async def _create_connection(user_service: UserService, connection_service: Conn
     available_users = await user_service.list(
         event_id=event.id,
         status=UserStatus.AVAILABLE,
+        is_admin=False,
     )
 
     random.shuffle(available_users)

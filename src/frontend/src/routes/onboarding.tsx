@@ -174,7 +174,7 @@ export default function OnboardingPage() {
                 <div className="h-2 rounded-full bg-gradient-to-r from-purple-600 to-pink-600 transition-all duration-300" style={{ width: `${progress}%` }} />
               </div>
 
-              <CardTitle className="font-bold text-gray-200 text-xl leading-tight sm:text-2xl">Let's Get to Know You!</CardTitle>
+              <CardTitle className="font-bold text-gray-200 text-md leading-tight">Let's Get to Know You!</CardTitle>
             </CardHeader>
 
             <CardContent className="px-4 pb-6 sm:px-6 sm:pb-8">
@@ -194,7 +194,7 @@ export default function OnboardingPage() {
                               {...field}
                               placeholder="Type your answer here..."
                               disabled={isSubmitting}
-                              className="resize-none rounded-lg text-base transition-all duration-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-500"
+                              className="h-12 resize-none rounded-lg text-base transition-all duration-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-500"
                             />
                           </FormControl>
                           <FormMessage className="text-xs" />
@@ -351,7 +351,7 @@ export default function OnboardingPage() {
                     >
                       {isSubmitting ? (
                         <div className="flex items-center gap-3">
-                          <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                          <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
                           <span>Creating Account...</span>
                         </div>
                       ) : (

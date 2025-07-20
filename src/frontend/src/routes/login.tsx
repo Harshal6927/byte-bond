@@ -103,7 +103,7 @@ export default function LoginPage() {
                 >
                   {isLoading ? (
                     <div className="flex items-center gap-3">
-                      <div className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                      <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
                       <span>Signing In...</span>
                     </div>
                   ) : (

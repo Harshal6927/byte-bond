@@ -5,7 +5,15 @@ from litestar.openapi import OpenAPIConfig
 from litestar.openapi.plugins import ScalarRenderPlugin
 
 from backend.cli import CLIPlugin
-from backend.config import alchemy_plugin, channels_plugin, jwt_cookie_auth, saq_plugin, settings, vite_plugin
+from backend.config import (
+    alchemy_plugin,
+    channels_plugin,
+    jwt_cookie_auth,
+    rate_limit,
+    saq_plugin,
+    settings,
+    vite_plugin,
+)
 from backend.controllers.auth import AuthController
 from backend.controllers.event import EventController
 from backend.controllers.frontend import WebController
@@ -43,4 +51,5 @@ app = Litestar(
         Exception: exception_handler,
         RepositoryError: exception_handler,
     },
+    middleware=[rate_limit.middleware],
 )
