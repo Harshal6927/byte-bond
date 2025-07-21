@@ -1,4 +1,5 @@
 import random
+from typing import TYPE_CHECKING
 
 from litestar import Request, get, post, status_codes
 from litestar.controller import Controller
@@ -24,6 +25,7 @@ from backend.models import Connection, ConnectionQuestion, ConnectionStatus, Que
 from backend.schema.event import GetEvent
 from backend.schema.game import (
     ConnectionQuestionData,
+    GameChatRequest,
     GameQuestionResponse,
     GameStartRequest,
     GameStatus,
@@ -31,6 +33,9 @@ from backend.schema.game import (
     QRScanRequest,
     QuestionResult,
 )
+
+if TYPE_CHECKING:
+    from litestar.channels.plugin import ChannelsPlugin
 
 GAME_QUESTIONS_COUNT = 6
 
@@ -332,6 +337,41 @@ class GameController(Controller):
                     "connection_count": user2.connection_count + 1,
                 },
             ],
+        )
+
+    @post("/chat")
+    async def chat(
+        self,
+        data: GameChatRequest,
+        request: Request,
+        connection_service: ConnectionService,
+    ) -> None:
+        user: User = request.user
+
+        # Get user's current active connection
+        current_connection = await self._get_user_active_connection(
+            user_id=user.id,
+            event_id=user.event_id,
+            connection_service=connection_service,
+        )
+
+        if not current_connection or current_connection.status != ConnectionStatus.ACTIVE:
+            raise HTTPException(
+                status_code=status_codes.HTTP_404_NOT_FOUND,
+                detail="No active connection found",
+            )
+
+        other_user_id = (
+            current_connection.user2_id if current_connection.user1_id == user.id else current_connection.user1_id
+        )
+        channels: ChannelsPlugin = request.app.plugins.get(
+            "litestar.channels.plugin.ChannelsPlugin",
+        )
+        channels.publish(
+            data={
+                "message": data.message,
+            },
+            channels=other_user_id,
         )
 
     async def _get_user_connection_questions(

@@ -41,3 +41,7 @@ class QuestionResult(Struct):
     correct: bool
     expected_answer: str
     your_answer: str
+
+
+class GameChatRequest(Struct):
+    message: Annotated[str, Meta(min_length=1)]

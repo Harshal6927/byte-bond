@@ -12,8 +12,10 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AppRouteImport } from './routes/_app'
+import { Route as AdminRouteImport } from './routes/_admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
+import { Route as AdminManageRouteImport } from './routes/_admin/manage'
 
 const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
@@ -29,6 +31,10 @@ const AppRoute = AppRouteImport.update({
   id: '/_app',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/_admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -39,37 +45,55 @@ const AppDashboardRoute = AppDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AppRoute,
 } as any)
+const AdminManageRoute = AdminManageRouteImport.update({
+  id: '/manage',
+  path: '/manage',
+  getParentRoute: () => AdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
+  '/manage': typeof AdminManageRoute
   '/dashboard': typeof AppDashboardRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
+  '/manage': typeof AdminManageRoute
   '/dashboard': typeof AppDashboardRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_admin': typeof AdminRouteWithChildren
   '/_app': typeof AppRouteWithChildren
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
+  '/_admin/manage': typeof AdminManageRoute
   '/_app/dashboard': typeof AppDashboardRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/onboarding' | '/dashboard'
+  fullPaths: '/' | '/login' | '/onboarding' | '/manage' | '/dashboard'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/onboarding' | '/dashboard'
-  id: '__root__' | '/' | '/_app' | '/login' | '/onboarding' | '/_app/dashboard'
+  to: '/' | '/login' | '/onboarding' | '/manage' | '/dashboard'
+  id:
+    | '__root__'
+    | '/'
+    | '/_admin'
+    | '/_app'
+    | '/login'
+    | '/onboarding'
+    | '/_admin/manage'
+    | '/_app/dashboard'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRouteWithChildren
   AppRoute: typeof AppRouteWithChildren
   LoginRoute: typeof LoginRoute
   OnboardingRoute: typeof OnboardingRoute
@@ -98,6 +122,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_admin': {
+      id: '/_admin'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -112,8 +143,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppDashboardRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_admin/manage': {
+      id: '/_admin/manage'
+      path: '/manage'
+      fullPath: '/manage'
+      preLoaderRoute: typeof AdminManageRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
+
+interface AdminRouteChildren {
+  AdminManageRoute: typeof AdminManageRoute
+}
+
+const AdminRouteChildren: AdminRouteChildren = {
+  AdminManageRoute: AdminManageRoute,
+}
+
+const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface AppRouteChildren {
   AppDashboardRoute: typeof AppDashboardRoute
@@ -127,6 +175,7 @@ const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRouteWithChildren,
   AppRoute: AppRouteWithChildren,
   LoginRoute: LoginRoute,
   OnboardingRoute: OnboardingRoute,
