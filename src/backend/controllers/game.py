@@ -348,17 +348,17 @@ class GameController(Controller):
     ) -> None:
         user: User = request.user
 
-        # Get user's current active connection
+        # Get user's current connection
         current_connection = await self._get_user_active_connection(
             user_id=user.id,
             event_id=user.event_id,
             connection_service=connection_service,
         )
 
-        if not current_connection or current_connection.status != ConnectionStatus.ACTIVE:
+        if not current_connection:
             raise HTTPException(
                 status_code=status_codes.HTTP_404_NOT_FOUND,
-                detail="No active connection found",
+                detail="No connection found",
             )
 
         other_user_id = (
@@ -371,7 +371,7 @@ class GameController(Controller):
             data={
                 "message": data.message,
             },
-            channels=other_user_id,
+            channels=str(other_user_id),
         )
 
     async def _get_user_connection_questions(

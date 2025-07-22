@@ -12,6 +12,13 @@ export type ConnectionQuestionData = {
 };
 
 /**
+ * GameChatRequest
+ */
+export type GameChatRequest = {
+    message: string;
+};
+
+/**
  * GameQuestionResponse
  */
 export type GameQuestionResponse = {
@@ -443,6 +450,33 @@ export type ApiGameAnswerQuestionAnswerQuestionResponses = {
 };
 
 export type ApiGameAnswerQuestionAnswerQuestionResponse = ApiGameAnswerQuestionAnswerQuestionResponses[keyof ApiGameAnswerQuestionAnswerQuestionResponses];
+
+export type ApiGameChatChatData = {
+    body: GameChatRequest;
+    path?: never;
+    query?: never;
+    url: '/api/game/chat';
+};
+
+export type ApiGameChatChatErrors = {
+    /**
+     * Validation Exception
+     */
+    400: {
+        status_code: number;
+        detail: string;
+        extra?: null | Array<unknown> | Array<unknown>;
+    };
+};
+
+export type ApiGameChatChatError = ApiGameChatChatErrors[keyof ApiGameChatChatErrors];
+
+export type ApiGameChatChatResponses = {
+    /**
+     * Document created, URL follows
+     */
+    201: unknown;
+};
 
 export type ApiGameCompleteConnectionCompleteConnectionData = {
     body?: never;

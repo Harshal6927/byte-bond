@@ -51,3 +51,5 @@ async def process_game(_: Context) -> None:
         active_events = await event_service.list(Event.is_active.is_(True))
         for event in active_events:
             await _create_connection(user_service=user_service, connection_service=connection_service, event=event)
+
+        await db_session.commit()

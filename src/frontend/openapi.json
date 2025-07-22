@@ -532,6 +532,70 @@
                 "deprecated": false
             }
         },
+        "/api/game/chat": {
+            "post": {
+                "tags": [
+                    "Game"
+                ],
+                "summary": "Chat",
+                "operationId": "ApiGameChatChat",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/GameChatRequest"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "201": {
+                        "description": "Document created, URL follows",
+                        "headers": {}
+                    },
+                    "400": {
+                        "description": "Bad request syntax or unsupported method",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status_code": {
+                                            "type": "integer"
+                                        },
+                                        "detail": {
+                                            "type": "string"
+                                        },
+                                        "extra": {
+                                            "additionalProperties": {},
+                                            "type": [
+                                                "null",
+                                                "object",
+                                                "array"
+                                            ]
+                                        }
+                                    },
+                                    "type": "object",
+                                    "required": [
+                                        "detail",
+                                        "status_code"
+                                    ],
+                                    "description": "Validation Exception",
+                                    "examples": [
+                                        {
+                                            "status_code": 400,
+                                            "detail": "Bad Request",
+                                            "extra": {}
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "deprecated": false
+            }
+        },
         "/api/game/complete-connection": {
             "post": {
                 "tags": [
@@ -1852,6 +1916,19 @@
                     "question_text"
                 ],
                 "title": "ConnectionQuestionData"
+            },
+            "GameChatRequest": {
+                "properties": {
+                    "message": {
+                        "type": "string",
+                        "minLength": 1
+                    }
+                },
+                "type": "object",
+                "required": [
+                    "message"
+                ],
+                "title": "GameChatRequest"
             },
             "GameQuestionResponse": {
                 "properties": {
