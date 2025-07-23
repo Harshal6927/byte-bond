@@ -51,6 +51,7 @@ class GameController(Controller):
         "connection_question_service": Provide(provide_connection_question_service),
     }
 
+    # Admin
     @post("/start", guards=[admin_user_guard])
     async def start_game(
         self,
@@ -93,6 +94,9 @@ class GameController(Controller):
 
         return event_service.to_schema(event, schema_type=GetEvent)
 
+    # GET endpoint for `Leaderboard`
+
+    # User
     @get("/status")
     async def get_game_status(
         self,
@@ -189,6 +193,22 @@ class GameController(Controller):
             connection_id=current_connection.id,
             question_service=question_service,
             connection_question_service=connection_question_service,
+        )
+
+        channels: ChannelsPlugin = request.app.plugins.get(
+            "litestar.channels.plugin.ChannelsPlugin",
+        )
+        channels.publish(
+            data={
+                "message": f"refresh-{current_connection.user1_id}",
+            },
+            channels="game-status",
+        )
+        channels.publish(
+            data={
+                "message": f"refresh-{current_connection.user2_id}",
+            },
+            channels="game-status",
         )
 
     @post("/answer-question")

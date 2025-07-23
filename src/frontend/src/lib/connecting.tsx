@@ -1,4 +1,4 @@
-import { type GameStatus, type GetUser, apiGameChatChat } from "@/client"
+import { type GameStatus, type GetUser, apiGameChatChat, apiGameScanQrScanQrCode } from "@/client"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer"
@@ -7,6 +7,7 @@ import { Camera, MessageCircle, QrCodeIcon, Scan, Send, Users, X } from "lucide-
 import QrScanner from "qr-scanner"
 import { useEffect, useRef, useState } from "react"
 import QRCode from "react-qr-code"
+import { toast } from "sonner"
 
 interface ConnectingProps {
   gameStatus: GameStatus
@@ -173,10 +174,21 @@ export function Connecting({ gameStatus, user }: ConnectingProps) {
     setIsScanning(false)
   }
 
-  const handleQRDetected = (qrData: string) => {
-    console.log("QR Code detected successfully:", qrData)
-    // TODO: Call API with qrData
-    // For now, just log and stop scanning
+  const handleQRDetected = async (qrData: string) => {
+    const response = await apiGameScanQrScanQrCode({
+      body: {
+        qr_code: qrData,
+      },
+    })
+
+    if (response.status === 201) {
+      toast.success("You have connected with your partner!")
+    } else {
+      toast.error("Failed to scan QR code", {
+        description: response.error?.detail,
+      })
+    }
+
     stopScanning()
   }
 
@@ -212,10 +224,6 @@ export function Connecting({ gameStatus, user }: ConnectingProps) {
       e.preventDefault()
       sendMessage()
     }
-  }
-
-  const formatTime = (timestamp: string) => {
-    return new Date(timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
   }
 
   return (
@@ -292,7 +300,7 @@ export function Connecting({ gameStatus, user }: ConnectingProps) {
             {!isScanning && hasPermission !== false && (
               <div className="mb-4 rounded-xl border-2 border-gray-300 border-dashed bg-gray-50 p-6 shadow-inner">
                 <Scan className="mx-auto mb-3 h-12 w-12 text-gray-400" />
-                <p className="text-gray-600 text-sm">Find your partner and scan their QR code</p>
+                <p className="text-gray-500 text-sm">Find your partner and scan their QR code</p>
               </div>
             )}
             <Button
@@ -320,27 +328,27 @@ export function Connecting({ gameStatus, user }: ConnectingProps) {
 
       {/* Instructions */}
       <Card className="rounded-2xl p-6 shadow-sm">
-        <h3 className="mb-5 text-center font-semibold text-base text-gray-300">What's Next?</h3>
+        <h3 className="text-center font-semibold text-base text-gray-300">What's Next?</h3>
         <div className="space-y-4">
           <div className="flex items-start gap-3">
             <div className="mt-0.5 flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-purple-100 font-bold text-purple-600 text-sm shadow-sm">1</div>
             <div>
               <p className="font-medium text-gray-300 text-sm">Connect with your partner</p>
-              <p className="text-gray-600 text-xs">{isQrGiver ? "Show your QR code" : "Scan their QR code"}</p>
+              <p className="text-gray-500 text-xs">{isQrGiver ? "Show your QR code" : "Scan their QR code"}</p>
             </div>
           </div>
           <div className="flex items-start gap-3">
             <div className="mt-0.5 flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-purple-100 font-bold text-purple-600 text-sm shadow-sm">2</div>
             <div>
               <p className="font-medium text-gray-300 text-sm">Answer questions</p>
-              <p className="text-gray-600 text-xs">Learn about each other through fun questions</p>
+              <p className="text-gray-500 text-xs">Learn about each other through fun questions</p>
             </div>
           </div>
           <div className="flex items-start gap-3">
             <div className="mt-0.5 flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-purple-100 font-bold text-purple-600 text-sm shadow-sm">3</div>
             <div>
               <p className="font-medium text-gray-300 text-sm">Earn points</p>
-              <p className="text-gray-600 text-xs">Get points for correct answers</p>
+              <p className="text-gray-500 text-xs">Get points for correct answers</p>
             </div>
           </div>
         </div>
@@ -377,16 +385,15 @@ export function Connecting({ gameStatus, user }: ConnectingProps) {
                 <div className="flex h-full flex-col items-center justify-center text-center text-gray-500">
                   <MessageCircle className="mb-4 h-16 w-16 text-gray-300" />
                   <h3 className="mb-2 font-semibold text-lg">Start chatting!</h3>
-                  <p className="text-gray-600 text-sm">Coordinate with your partner to find each other's location.</p>
+                  <p className="text-gray-500 text-sm">Coordinate with your partner to find each other's location.</p>
                 </div>
               ) : (
                 <div className="space-y-4">
                   {messages.map((message, idx) => (
                     // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
                     <div key={message.message + idx} className={`flex ${!message.isPartner ? "justify-end" : "justify-start"}`}>
-                      <div className={`max-w-[80%] rounded-2xl px-4 py-2 shadow-sm ${!message.isPartner ? "bg-blue-500 text-white" : "bg-gray-100 text-gray-900"}`}>
+                      <div className={`max-w-[80%] rounded-xl px-4 py-2 shadow-sm ${!message.isPartner ? "bg-blue-500 text-white" : "bg-gray-100 text-gray-900"}`}>
                         <p className="break-words text-sm">{message.message}</p>
-                        <p className={`mt-1 text-right text-xs ${!message.isPartner ? "text-blue-100" : "text-gray-500"}`}>{formatTime(new Date().toISOString())}</p>
                       </div>
                     </div>
                   ))}

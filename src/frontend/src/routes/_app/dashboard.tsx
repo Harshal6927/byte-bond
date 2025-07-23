@@ -17,77 +17,114 @@ function DashboardPage() {
   const [gameStatus, setGameStatus] = useState<GameStatus | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [isConnectedToWS, setIsConnectedToWS] = useState(false)
+  const { user } = useUser()
+  const socketRef = useRef<WebSocket | null>(null)
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
   const isPollingRef = useRef(true)
-  const { user } = useUser()
 
-  // Function to generate random interval between 10-15 seconds
   const getRandomInterval = useCallback(() => {
     return Math.floor(Math.random() * (15000 - 10000 + 1)) + 10000 // 10-15 seconds in milliseconds
   }, [])
 
-  // Function to fetch game status
   const fetchGameStatus = useCallback(async () => {
-    try {
-      const response = await apiGameStatusGetGameStatus()
+    const response = await apiGameStatusGetGameStatus()
 
-      if (response.status === 200 && response.data) {
-        setGameStatus(response.data)
-        setError(null)
-      } else {
-        setError("Failed to fetch game status")
-        toast.error("Failed to fetch game status")
-      }
-    } catch (error) {
-      console.error("Error fetching game status:", error)
-      setError("Network error")
-      toast.error("Network error")
-    } finally {
-      setIsLoading(false)
+    if (response.status === 200 && response.data) {
+      setGameStatus(response.data)
+      setError(null)
+    } else {
+      setError("Failed to fetch game status")
+      toast.error("Failed to fetch game status")
     }
+
+    setIsLoading(false)
   }, [])
 
-  // Function to schedule next poll
   const scheduleNextPoll = useCallback(() => {
     if (!isPollingRef.current) return
 
     const interval = getRandomInterval()
     timeoutRef.current = setTimeout(() => {
       fetchGameStatus().then(() => {
-        scheduleNextPoll() // Schedule the next poll
+        // Only schedule next poll if user status is still "available"
+        if (gameStatus?.user_status === "available") {
+          scheduleNextPoll()
+        }
       })
     }, interval)
-  }, [fetchGameStatus, getRandomInterval])
+  }, [fetchGameStatus, getRandomInterval, gameStatus?.user_status])
 
-  // Initial load and start polling
+  // WebSocket connection for game status updates
   useEffect(() => {
-    isPollingRef.current = true
+    if (!user) return
 
-    // Initial fetch
-    fetchGameStatus().then(() => {
-      // Start polling after initial load
-      scheduleNextPoll()
+    const protocol = window.location.protocol === "https:" ? "wss:" : "ws:"
+    const host = window.location.host
+    const socket = new WebSocket(`${protocol}//${host}/ws/game-status`)
+
+    socket.addEventListener("open", () => {
+      setIsConnectedToWS(true)
     })
 
-    // Cleanup function
-    return () => {
-      isPollingRef.current = false
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current)
-        timeoutRef.current = null
+    socket.addEventListener("message", (event) => {
+      const data = JSON.parse(event.data)
+      if (data.message === `refresh-${user.id}`) {
+        fetchGameStatus()
       }
-    }
-  }, [fetchGameStatus, scheduleNextPoll])
+    })
 
-  // Handle page visibility change to pause/resume polling
+    socket.addEventListener("close", () => {
+      setIsConnectedToWS(false)
+    })
+
+    socket.addEventListener("error", (error) => {
+      console.error("Game status WebSocket error:", error)
+      setIsConnectedToWS(false)
+    })
+
+    socketRef.current = socket
+
+    return () => {
+      socket.close()
+      socketRef.current = null
+    }
+  }, [user, fetchGameStatus])
+
+  // Initial fetch on component mount
+  useEffect(() => {
+    fetchGameStatus()
+  }, [fetchGameStatus])
+
+  // Handle game status changes - start/stop polling based on user status
+  useEffect(() => {
+    // Clear existing timeout
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current)
+      timeoutRef.current = null
+    }
+
+    // Only start polling if user status is "available"
+    if (gameStatus?.user_status === "available" && isPollingRef.current) {
+      scheduleNextPoll()
+    }
+  }, [gameStatus?.user_status, scheduleNextPoll])
+
+  // Handle page visibility change
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.visibilityState === "visible") {
-        // Resume polling when page becomes visible
-        if (!timeoutRef.current && isPollingRef.current) {
+        // Resume polling when page becomes visible, but only if user is available
+        if (!timeoutRef.current && isPollingRef.current && gameStatus?.user_status === "available") {
           fetchGameStatus().then(() => {
-            scheduleNextPoll()
+            if (gameStatus?.user_status === "available") {
+              scheduleNextPoll()
+            }
           })
+        }
+        // If WebSocket is disconnected when page becomes visible, fetch status
+        if (!isConnectedToWS) {
+          fetchGameStatus()
         }
       } else {
         // Pause polling when page is hidden
@@ -103,7 +140,20 @@ function DashboardPage() {
     return () => {
       document.removeEventListener("visibilitychange", handleVisibilityChange)
     }
-  }, [fetchGameStatus, scheduleNextPoll])
+  }, [fetchGameStatus, scheduleNextPoll, isConnectedToWS, gameStatus?.user_status])
+
+  // Cleanup polling on unmount
+  useEffect(() => {
+    isPollingRef.current = true
+
+    return () => {
+      isPollingRef.current = false
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+        timeoutRef.current = null
+      }
+    }
+  }, [])
 
   // Manual refresh function
   const handleRefresh = useCallback(() => {
@@ -153,6 +203,15 @@ function DashboardPage() {
           {gameStatus.user_status === "connecting" && <Connecting gameStatus={gameStatus} user={user} />}
           {gameStatus.user_status === "busy" && <Busy gameStatus={gameStatus} />}
         </div>
+
+        {/* WebSocket Connection Status - Only show in development */}
+        {process.env.NODE_ENV === "development" && (
+          <div className="fixed top-2 right-2 z-50">
+            <div className={`rounded-full px-2 py-1 text-xs ${isConnectedToWS ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
+              WS: {isConnectedToWS ? "Connected" : "Disconnected"}
+            </div>
+          </div>
+        )}
       </div>
     )
   }

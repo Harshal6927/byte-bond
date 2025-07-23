@@ -15,6 +15,7 @@ from backend.config import (
     vite_plugin,
 )
 from backend.controllers.auth import AuthController
+from backend.controllers.connection import ConnectionController
 from backend.controllers.event import EventController
 from backend.controllers.frontend import WebController
 from backend.controllers.game import GameController
@@ -27,6 +28,7 @@ app = Litestar(
     debug=settings.debug,
     route_handlers=[
         AuthController,
+        ConnectionController,
         EventController,
         GameController,
         QuestionController,

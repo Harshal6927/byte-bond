@@ -15,7 +15,7 @@ export function Navbar() {
 
   return (
     <NavigationMenu className="gap-2 p-2">
-      <NavigationMenuList>
+      {/* <NavigationMenuList>
         <NavigationMenuItem>
           <Link to="/dashboard">
             <Button type="button" variant="outline" size="sm">
@@ -23,19 +23,16 @@ export function Navbar() {
             </Button>
           </Link>
         </NavigationMenuItem>
-      </NavigationMenuList>
+      </NavigationMenuList> */}
 
       <NavigationMenuList>
         <NavigationMenuItem>
           <DropdownMenu>
-            <DropdownMenuTrigger className="flex gap-2">
+            <DropdownMenuTrigger className="flex items-center gap-2">
               <Avatar>
                 <AvatarImage src="https://github.com/shadcn.png" />
               </Avatar>
-              <div className="text-start">
-                <div className="font-medium text-sm leading-none">{user.name}</div>
-                <div className="text-muted-foreground text-xs">{user.email}</div>
-              </div>
+              <div className="font-medium text-sm leading-none">{user.name}</div>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
               <div className="flex flex-col gap-1">
