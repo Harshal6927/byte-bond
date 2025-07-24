@@ -23,6 +23,7 @@ class UserAdminView(ModelView, model=User):
     form_excluded_columns = [
         User.event,
         User.answers,
+        User.connection_questions,
         User.connections_as_user1,
         User.connections_as_user2,
         User.created_at,
@@ -64,6 +65,8 @@ class ConnectionAdminView(ModelView, model=Connection):
         Connection.end_time,
     ]
     form_excluded_columns = [
+        Connection.start_time,
+        Connection.end_time,
         Connection.event,
         Connection.user1,
         Connection.user2,
@@ -84,6 +87,7 @@ class ConnectionQuestionAdminView(ModelView, model=ConnectionQuestion):
         ConnectionQuestion.answered_correctly,
     ]
     form_excluded_columns = [
+        ConnectionQuestion.user,
         ConnectionQuestion.connection,
         ConnectionQuestion.question,
         ConnectionQuestion.created_at,

@@ -72,7 +72,8 @@ class User(BigIntAuditBase):
 
     event: Mapped["Event"] = relationship(back_populates="users")
     answers: Mapped[list["UserAnswer"]] = relationship(back_populates="user")
-    # Relationships for connections where this user is user1 (QR giver) or user2 (scanner)
+    connection_questions: Mapped[list["ConnectionQuestion"]] = relationship(back_populates="user")
+    # Relationships for `Connection` where this user is user1 (QR giver) or user2 (scanner)
     connections_as_user1: Mapped[list["Connection"]] = relationship(
         foreign_keys="[Connection.user1_id]",
         back_populates="user1",
@@ -143,6 +144,7 @@ class Connection(BigIntAuditBase):
     __table_args__ = (
         # Prevent duplicate connections between same users
         UniqueConstraint("event_id", "user1_id", "user2_id", name="uq_connection_users"),
+        UniqueConstraint("event_id", "user2_id", "user1_id", name="uq_connection_users_reverse"),
         # Ensure user1 and user2 are different
         CheckConstraint("user1_id != user2_id", name="ck_different_users"),
     )
@@ -192,6 +194,7 @@ class ConnectionQuestion(BigIntAuditBase):
     # ORM Relationships
     # -----------------
 
+    user: Mapped["User"] = relationship(back_populates="connection_questions")
     connection: Mapped["Connection"] = relationship(back_populates="connection_questions")
     question: Mapped["Question"] = relationship(back_populates="connection_questions")
 

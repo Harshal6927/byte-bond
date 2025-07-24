@@ -12,11 +12,6 @@ export type ConnectionQuestionData = {
 };
 
 /**
- * ConnectionStatus
- */
-export type ConnectionStatus = 'pending' | 'active' | 'completed' | 'cancelled';
-
-/**
  * GameChatRequest
  */
 export type GameChatRequest = {
@@ -53,21 +48,6 @@ export type GameStatus = {
  */
 export type GameStopRequest = {
     event_id: number;
-};
-
-/**
- * GetConnection
- */
-export type GetConnection = {
-    id: number;
-    start_time: string;
-    end_time: string;
-    status: ConnectionStatus;
-    event_id: number;
-    user1_id: number;
-    user2_id: number;
-    created_at: string;
-    updated_at: string;
 };
 
 /**
@@ -149,18 +129,6 @@ export type LeaderboardEntry = {
 };
 
 /**
- * PatchConnection
- */
-export type PatchConnection = {
-    start_time?: string;
-    end_time?: string;
-    status?: ConnectionStatus;
-    event_id?: number;
-    user1_id?: number;
-    user2_id?: number;
-};
-
-/**
  * PatchEvent
  */
 export type PatchEvent = {
@@ -193,16 +161,6 @@ export type PatchUser = {
  */
 export type PatchUserAnswer = {
     answer?: string;
-};
-
-/**
- * PostConnection
- */
-export type PostConnection = {
-    event_id: number;
-    user1_id: number;
-    user2_id: number;
-    end_time?: string;
 };
 
 /**
@@ -333,158 +291,6 @@ export type ApiAuthLogoutLogoutResponses = {
 };
 
 export type ApiAuthLogoutLogoutResponse = ApiAuthLogoutLogoutResponses[keyof ApiAuthLogoutLogoutResponses];
-
-export type ApiConnectionsConnectionIdDeleteConnectionData = {
-    body?: never;
-    path: {
-        connection_id: number;
-    };
-    query?: never;
-    url: '/api/connections/{connection_id}';
-};
-
-export type ApiConnectionsConnectionIdDeleteConnectionErrors = {
-    /**
-     * Validation Exception
-     */
-    400: {
-        status_code: number;
-        detail: string;
-        extra?: null | Array<unknown> | Array<unknown>;
-    };
-};
-
-export type ApiConnectionsConnectionIdDeleteConnectionError = ApiConnectionsConnectionIdDeleteConnectionErrors[keyof ApiConnectionsConnectionIdDeleteConnectionErrors];
-
-export type ApiConnectionsConnectionIdDeleteConnectionResponses = {
-    /**
-     * Request fulfilled, document follows
-     */
-    200: GetConnection;
-};
-
-export type ApiConnectionsConnectionIdDeleteConnectionResponse = ApiConnectionsConnectionIdDeleteConnectionResponses[keyof ApiConnectionsConnectionIdDeleteConnectionResponses];
-
-export type ApiConnectionsConnectionIdGetConnectionData = {
-    body?: never;
-    path: {
-        connection_id: number;
-    };
-    query?: never;
-    url: '/api/connections/{connection_id}';
-};
-
-export type ApiConnectionsConnectionIdGetConnectionErrors = {
-    /**
-     * Validation Exception
-     */
-    400: {
-        status_code: number;
-        detail: string;
-        extra?: null | Array<unknown> | Array<unknown>;
-    };
-};
-
-export type ApiConnectionsConnectionIdGetConnectionError = ApiConnectionsConnectionIdGetConnectionErrors[keyof ApiConnectionsConnectionIdGetConnectionErrors];
-
-export type ApiConnectionsConnectionIdGetConnectionResponses = {
-    /**
-     * Request fulfilled, document follows
-     */
-    200: GetConnection;
-};
-
-export type ApiConnectionsConnectionIdGetConnectionResponse = ApiConnectionsConnectionIdGetConnectionResponses[keyof ApiConnectionsConnectionIdGetConnectionResponses];
-
-export type ApiConnectionsConnectionIdPatchConnectionData = {
-    body: PatchConnection;
-    path: {
-        connection_id: number;
-    };
-    query?: never;
-    url: '/api/connections/{connection_id}';
-};
-
-export type ApiConnectionsConnectionIdPatchConnectionErrors = {
-    /**
-     * Validation Exception
-     */
-    400: {
-        status_code: number;
-        detail: string;
-        extra?: null | Array<unknown> | Array<unknown>;
-    };
-};
-
-export type ApiConnectionsConnectionIdPatchConnectionError = ApiConnectionsConnectionIdPatchConnectionErrors[keyof ApiConnectionsConnectionIdPatchConnectionErrors];
-
-export type ApiConnectionsConnectionIdPatchConnectionResponses = {
-    /**
-     * Request fulfilled, document follows
-     */
-    200: GetConnection;
-};
-
-export type ApiConnectionsConnectionIdPatchConnectionResponse = ApiConnectionsConnectionIdPatchConnectionResponses[keyof ApiConnectionsConnectionIdPatchConnectionResponses];
-
-export type ApiConnectionsGetConnectionsData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/api/connections';
-};
-
-export type ApiConnectionsGetConnectionsResponses = {
-    /**
-     * Request fulfilled, document follows
-     */
-    200: {
-        items?: Array<GetConnection>;
-        /**
-         * Maximal number of items to send.
-         */
-        limit?: number;
-        /**
-         * Offset from the beginning of the query.
-         */
-        offset?: number;
-        /**
-         * Total number of items.
-         */
-        total?: number;
-    };
-};
-
-export type ApiConnectionsGetConnectionsResponse = ApiConnectionsGetConnectionsResponses[keyof ApiConnectionsGetConnectionsResponses];
-
-export type ApiConnectionsPostConnectionData = {
-    body: PostConnection;
-    path?: never;
-    query?: never;
-    url: '/api/connections';
-};
-
-export type ApiConnectionsPostConnectionErrors = {
-    /**
-     * Validation Exception
-     */
-    400: {
-        status_code: number;
-        detail: string;
-        extra?: null | Array<unknown> | Array<unknown>;
-    };
-};
-
-export type ApiConnectionsPostConnectionError = ApiConnectionsPostConnectionErrors[keyof ApiConnectionsPostConnectionErrors];
-
-export type ApiConnectionsPostConnectionResponses = {
-    /**
-     * Document created, URL follows
-     */
-    201: GetConnection;
-};
-
-export type ApiConnectionsPostConnectionResponse = ApiConnectionsPostConnectionResponses[keyof ApiConnectionsPostConnectionResponses];
 
 export type ApiEventsEventIdDeleteEventData = {
     body?: never;
