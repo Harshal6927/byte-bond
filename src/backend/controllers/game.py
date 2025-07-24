@@ -242,20 +242,10 @@ class GameController(Controller):
             connection_question_service=connection_question_service,
         )
 
-        channels: ChannelsPlugin = request.app.plugins.get(
-            "litestar.channels.plugin.ChannelsPlugin",
-        )
-        channels.publish(
-            data={
-                "message": f"refresh-{current_connection.user1_id}",
-            },
-            channels="game-status",
-        )
-        channels.publish(
-            data={
-                "message": f"refresh-{current_connection.user2_id}",
-            },
-            channels="game-status",
+        self._refresh_user_game_status(
+            user1=current_connection.user1_id,
+            user2=current_connection.user2_id,
+            request=request,
         )
 
     @post("/answer-question")
@@ -304,7 +294,7 @@ class GameController(Controller):
         other_user_id = (
             current_connection.user2_id if current_connection.user1_id == user.id else current_connection.user1_id
         )
-        other_user = await user_service.get(other_user_id)
+        other_user = await user_service.get(other_user_id, load=[User.answers])
 
         other_user_answer = None
         for answer in other_user.answers:
@@ -404,6 +394,12 @@ class GameController(Controller):
                     "connection_count": user2.connection_count + 1,
                 },
             ],
+        )
+
+        self._refresh_user_game_status(
+            user1=current_connection.user1_id,
+            user2=current_connection.user2_id,
+            request=request,
         )
 
     @post("/chat")
@@ -544,3 +540,24 @@ class GameController(Controller):
             user2_id=user_id,
             event_id=event_id,
         )
+
+    def _refresh_user_game_status(self, *, user1: int | None, user2: int | None, request: Request) -> None:
+        channels: ChannelsPlugin = request.app.plugins.get(
+            "litestar.channels.plugin.ChannelsPlugin",
+        )
+
+        if user1:
+            channels.publish(
+                data={
+                    "message": f"refresh-{user1}",
+                },
+                channels="game-status",
+            )
+
+        if user2:
+            channels.publish(
+                data={
+                    "message": f"refresh-{user2}",
+                },
+                channels="game-status",
+            )

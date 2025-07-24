@@ -1,4 +1,3 @@
-import { type GameStatus, apiGameStatusGetGameStatus } from "@/client"
 import { Navbar } from "@/components/navbar"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useUser } from "@/components/user-context"

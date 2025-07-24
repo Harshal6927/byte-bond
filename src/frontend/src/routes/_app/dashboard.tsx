@@ -199,7 +199,7 @@ function DashboardPage() {
       <div className="min-h-screen">
         {/* Main content */}
         <div className="mx-auto max-w-md">
-          {gameStatus.user_status === "available" && <Available gameStatus={gameStatus} />}
+          {gameStatus.user_status === "available" && <Available />}
           {gameStatus.user_status === "connecting" && <Connecting gameStatus={gameStatus} user={user} />}
           {gameStatus.user_status === "busy" && <Busy gameStatus={gameStatus} />}
         </div>

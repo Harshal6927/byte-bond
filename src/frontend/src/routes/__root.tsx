@@ -11,7 +11,7 @@ export const Route = createRootRoute({
         <UserProvider>
           <TooltipProvider>
             <Outlet />
-            <Toaster richColors />
+            <Toaster richColors position="top-right" />
           </TooltipProvider>
         </UserProvider>
       </ThemeProvider>

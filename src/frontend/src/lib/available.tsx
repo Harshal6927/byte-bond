@@ -1,12 +1,7 @@
-import type { GameStatus } from "@/client"
 import { Card } from "@/components/ui/card"
 import { Users, Wifi } from "lucide-react"
 
-interface AvailableProps {
-  gameStatus: GameStatus
-}
-
-export function Available({ gameStatus }: AvailableProps) {
+export function Available() {
   return (
     <div className="relative space-y-6 p-4 sm:p-6">
       {/* Status Header */}

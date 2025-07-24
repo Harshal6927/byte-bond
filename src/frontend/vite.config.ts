@@ -24,7 +24,7 @@ export default defineConfig({
     },
   },
   build: {
-    outDir: "../app/web/static",
+    outDir: "../backend/web/static",
     emptyOutDir: true,
   },
   server: {

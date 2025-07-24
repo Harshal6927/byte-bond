@@ -73,11 +73,11 @@ class User(BigIntAuditBase):
     event: Mapped["Event"] = relationship(back_populates="users")
     answers: Mapped[list["UserAnswer"]] = relationship(back_populates="user")
     # Relationships for connections where this user is user1 (QR giver) or user2 (scanner)
-    connections_as_user1: Mapped["Connection"] = relationship(
+    connections_as_user1: Mapped[list["Connection"]] = relationship(
         foreign_keys="[Connection.user1_id]",
         back_populates="user1",
     )
-    connections_as_user2: Mapped["Connection"] = relationship(
+    connections_as_user2: Mapped[list["Connection"]] = relationship(
         foreign_keys="[Connection.user2_id]",
         back_populates="user2",
     )
