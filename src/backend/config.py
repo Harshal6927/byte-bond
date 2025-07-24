@@ -13,7 +13,16 @@ from litestar.plugins.sqlalchemy import (
 from litestar.security.jwt import JWTCookieAuth, Token
 from litestar_saq import CronJob, QueueConfig, SAQConfig, SAQPlugin
 from litestar_vite import ViteConfig, VitePlugin
+from sqladmin_litestar_plugin import SQLAdminPlugin
 
+from backend.lib.admin import (
+    ConnectionAdminView,
+    ConnectionQuestionAdminView,
+    EventAdminView,
+    QuestionAdminView,
+    UserAdminView,
+    UserAnswerAdminView,
+)
 from backend.lib.dependencies import provide_user_service
 from backend.models import User
 from backend.settings import get_settings
@@ -41,14 +50,23 @@ channels_plugin = ChannelsPlugin(
 # Auth
 async def _retrieve_user_handler(
     token: Token,
-    _: ASGIConnection[Any, Any, Any, Any],
+    connection: ASGIConnection[Any, Any, Any, Any],
 ) -> User | None:
     async with sqlalchemy_config.get_session() as db_session:
         users_service = await anext(provide_user_service(db_session))
 
-        return await users_service.get_one_or_none(
+        user = await users_service.get_one_or_none(
             id=int(token.sub),
         )
+
+        if not user:
+            return None
+
+        raw_path = str(connection.scope.get("raw_path"))
+        if raw_path.startswith("b'/admin") and not user.is_admin:
+            return None
+
+        return user
 
 
 jwt_cookie_auth = JWTCookieAuth[User](
@@ -104,3 +122,17 @@ saq_plugin = SAQPlugin(
 
 # Rate Limiting
 rate_limit = RateLimitConfig(rate_limit=("minute", 100), exclude_opt_key="no_app_rate_limit")
+
+
+# Admin
+admin_plugin = SQLAdminPlugin(
+    views=[
+        ConnectionAdminView,
+        ConnectionQuestionAdminView,
+        EventAdminView,
+        QuestionAdminView,
+        UserAdminView,
+        UserAnswerAdminView,
+    ],
+    engine=sqlalchemy_config.get_engine(),
+)

@@ -1,3 +1,4 @@
+import { type GameStatus, apiGameStatusGetGameStatus } from "@/client"
 import { Navbar } from "@/components/navbar"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useUser } from "@/components/user-context"
@@ -21,7 +22,6 @@ function AdminLayout() {
   return (
     <>
       <Navbar />
-      <div>Hello "/_admin"!</div>
       <main>
         <Outlet />
       </main>

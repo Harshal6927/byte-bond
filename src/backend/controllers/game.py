@@ -30,6 +30,8 @@ from backend.schema.game import (
     GameStartRequest,
     GameStatus,
     GameStopRequest,
+    Leaderboard,
+    LeaderboardEntry,
     QRScanRequest,
     QuestionResult,
 )
@@ -94,7 +96,52 @@ class GameController(Controller):
 
         return event_service.to_schema(event, schema_type=GetEvent)
 
-    # GET endpoint for `Leaderboard`
+    @get("/leaderboard/{event_id:int}", guards=[admin_user_guard])
+    async def get_leaderboard(
+        self,
+        event_id: int,
+        event_service: EventService,
+        user_service: UserService,
+    ) -> Leaderboard:
+        event = await event_service.get(event_id)
+
+        users = await user_service.list(
+            event_id=event_id,
+            is_admin=False,
+            order_by=[
+                User.points.desc(),
+                User.connection_count.desc(),
+                User.name.asc(),
+            ],
+        )
+
+        # Create leaderboard entries with rank
+        entries = []
+        current_rank = 1
+        for i, user in enumerate(users):
+            # Handle ties - users with same points and connections get same rank
+            if i > 0:
+                prev_user = users[i - 1]
+                if user.points != prev_user.points or user.connection_count != prev_user.connection_count:
+                    current_rank = i + 1
+
+            entries.append(
+                LeaderboardEntry(
+                    id=user.id,
+                    name=user.name,
+                    email=user.email,
+                    points=user.points,
+                    connection_count=user.connection_count,
+                    rank=current_rank,
+                ),
+            )
+
+        return Leaderboard(
+            event_id=event.id,
+            event_name=event.name,
+            entries=entries,
+            total_users=len(entries),
+        )
 
     # User
     @get("/status")

@@ -45,3 +45,19 @@ class QuestionResult(Struct):
 
 class GameChatRequest(Struct):
     message: Annotated[str, Meta(min_length=1)]
+
+
+class LeaderboardEntry(Struct):
+    id: int
+    name: str
+    email: str
+    points: int
+    connection_count: int
+    rank: int
+
+
+class Leaderboard(Struct):
+    event_id: int
+    event_name: str
+    entries: list[LeaderboardEntry]
+    total_users: int

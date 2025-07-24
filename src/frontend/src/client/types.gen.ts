@@ -127,6 +127,28 @@ export type GetUserAnswer = {
 };
 
 /**
+ * Leaderboard
+ */
+export type Leaderboard = {
+    event_id: number;
+    event_name: string;
+    entries: Array<LeaderboardEntry>;
+    total_users: number;
+};
+
+/**
+ * LeaderboardEntry
+ */
+export type LeaderboardEntry = {
+    id: number;
+    name: string;
+    email: string;
+    points: number;
+    connection_count: number;
+    rank: number;
+};
+
+/**
  * PatchConnection
  */
 export type PatchConnection = {
@@ -701,6 +723,37 @@ export type ApiGameStatusGetGameStatusResponses = {
 };
 
 export type ApiGameStatusGetGameStatusResponse = ApiGameStatusGetGameStatusResponses[keyof ApiGameStatusGetGameStatusResponses];
+
+export type ApiGameLeaderboardEventIdGetLeaderboardData = {
+    body?: never;
+    path: {
+        event_id: number;
+    };
+    query?: never;
+    url: '/api/game/leaderboard/{event_id}';
+};
+
+export type ApiGameLeaderboardEventIdGetLeaderboardErrors = {
+    /**
+     * Validation Exception
+     */
+    400: {
+        status_code: number;
+        detail: string;
+        extra?: null | Array<unknown> | Array<unknown>;
+    };
+};
+
+export type ApiGameLeaderboardEventIdGetLeaderboardError = ApiGameLeaderboardEventIdGetLeaderboardErrors[keyof ApiGameLeaderboardEventIdGetLeaderboardErrors];
+
+export type ApiGameLeaderboardEventIdGetLeaderboardResponses = {
+    /**
+     * Request fulfilled, document follows
+     */
+    200: Leaderboard;
+};
+
+export type ApiGameLeaderboardEventIdGetLeaderboardResponse = ApiGameLeaderboardEventIdGetLeaderboardResponses[keyof ApiGameLeaderboardEventIdGetLeaderboardResponses];
 
 export type ApiGameScanQrScanQrCodeData = {
     body: QrScanRequest;

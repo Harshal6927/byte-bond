@@ -6,6 +6,7 @@ from litestar.openapi.plugins import ScalarRenderPlugin
 
 from backend.cli import CLIPlugin
 from backend.config import (
+    admin_plugin,
     alchemy_plugin,
     channels_plugin,
     jwt_cookie_auth,
@@ -36,7 +37,7 @@ app = Litestar(
         UserAnswerController,
         WebController,
     ],
-    plugins=[alchemy_plugin, channels_plugin, saq_plugin, vite_plugin, CLIPlugin()],
+    plugins=[admin_plugin, alchemy_plugin, channels_plugin, saq_plugin, vite_plugin, CLIPlugin()],
     on_app_init=[jwt_cookie_auth.on_app_init],
     openapi_config=OpenAPIConfig(
         title="Byte Bond",
