@@ -5,24 +5,34 @@ repos:
     rev: v5.0.0
     hooks:
       - id: check-ast
+        exclude: ^migrations/
       - id: check-case-conflict
+        exclude: ^migrations/
       - id: check-merge-conflict
+        exclude: ^migrations/
       - id: check-toml
+        exclude: ^migrations/
       - id: debug-statements
+        exclude: ^migrations/
       - id: end-of-file-fixer
+        exclude: ^migrations/
       - id: mixed-line-ending
+        exclude: ^migrations/
       - id: trailing-whitespace
+        exclude: ^migrations/
   - repo: https://github.com/charliermarsh/ruff-pre-commit
     rev: v0.11.10
     hooks:
       - id: ruff
         args: [--fix]
+        exclude: ^migrations/
       - id: ruff-format
+        exclude: ^migrations/
   - repo: https://github.com/codespell-project/codespell
     rev: v2.4.1
     hooks:
       - id: codespell
-        exclude: "uv.lock"
+        exclude: "uv.lock|^migrations/"
         args: ["--ignore-words-list=ure"]
         additional_dependencies:
           - tomli

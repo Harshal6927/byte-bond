@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: google/alloydbomni:16
+    container_name: alloydbomni_byte-bond
+    environment:
+      POSTGRES_DB: mydb
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+    volumes:
+      - byte-bond-data:/var/lib/postgresql/data
+    ports:
+      - "8931:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U myuser -d mydb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  byte-bond-data: {}

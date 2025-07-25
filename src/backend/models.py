@@ -3,9 +3,8 @@ import uuid
 from enum import StrEnum
 
 from advanced_alchemy.base import BigIntAuditBase
-from advanced_alchemy.types import DateTimeUTC
-from sqlalchemy import CheckConstraint, ForeignKey, Index, UniqueConstraint
-from sqlalchemy.dialects.postgresql import JSONB
+from advanced_alchemy.types import DateTimeUTC, JsonB
+from sqlalchemy import CheckConstraint, ForeignKey, Index, UniqueConstraint, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 
@@ -33,7 +32,7 @@ class Event(BigIntAuditBase):
     name: Mapped[str]
     code: Mapped[str] = mapped_column(unique=True, index=True)
     is_active: Mapped[bool] = mapped_column(default=False)
-    whitelist: Mapped[dict] = mapped_column(JSONB, default={})  # Whitelisted email should in a list with key "emails"
+    whitelist: Mapped[dict] = mapped_column(JsonB, default={})  # Whitelisted email should in a list with key "emails"
 
     # -----------------
     # ORM Relationships
@@ -142,9 +141,14 @@ class Connection(BigIntAuditBase):
 
     __tablename__ = "connections"
     __table_args__ = (
-        # Prevent duplicate connections between same users
-        UniqueConstraint("event_id", "user1_id", "user2_id", name="uq_connection_users"),
-        UniqueConstraint("event_id", "user2_id", "user1_id", name="uq_connection_users_reverse"),
+        # Prevent duplicate connections between same users regardless of order.
+        Index(
+            "ix_unique_connection_users",
+            "event_id",
+            text("LEAST(user1_id, user2_id)"),
+            text("GREATEST(user1_id, user2_id)"),
+            unique=True,
+        ),
         # Ensure user1 and user2 are different
         CheckConstraint("user1_id != user2_id", name="ck_different_users"),
     )
