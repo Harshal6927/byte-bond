@@ -16,6 +16,7 @@ import { Route as AdminRouteImport } from './routes/_admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppDashboardRouteImport } from './routes/_app/dashboard'
 import { Route as AdminManageRouteImport } from './routes/_admin/manage'
+import { Route as AdminLeaderboardRouteImport } from './routes/_admin/leaderboard'
 
 const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
@@ -50,11 +51,17 @@ const AdminManageRoute = AdminManageRouteImport.update({
   path: '/manage',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminLeaderboardRoute = AdminLeaderboardRouteImport.update({
+  id: '/leaderboard',
+  path: '/leaderboard',
+  getParentRoute: () => AdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
+  '/leaderboard': typeof AdminLeaderboardRoute
   '/manage': typeof AdminManageRoute
   '/dashboard': typeof AppDashboardRoute
 }
@@ -62,6 +69,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
+  '/leaderboard': typeof AdminLeaderboardRoute
   '/manage': typeof AdminManageRoute
   '/dashboard': typeof AppDashboardRoute
 }
@@ -72,14 +80,21 @@ export interface FileRoutesById {
   '/_app': typeof AppRouteWithChildren
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
+  '/_admin/leaderboard': typeof AdminLeaderboardRoute
   '/_admin/manage': typeof AdminManageRoute
   '/_app/dashboard': typeof AppDashboardRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/onboarding' | '/manage' | '/dashboard'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/onboarding'
+    | '/leaderboard'
+    | '/manage'
+    | '/dashboard'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/onboarding' | '/manage' | '/dashboard'
+  to: '/' | '/login' | '/onboarding' | '/leaderboard' | '/manage' | '/dashboard'
   id:
     | '__root__'
     | '/'
@@ -87,6 +102,7 @@ export interface FileRouteTypes {
     | '/_app'
     | '/login'
     | '/onboarding'
+    | '/_admin/leaderboard'
     | '/_admin/manage'
     | '/_app/dashboard'
   fileRoutesById: FileRoutesById
@@ -150,14 +166,23 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminManageRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/_admin/leaderboard': {
+      id: '/_admin/leaderboard'
+      path: '/leaderboard'
+      fullPath: '/leaderboard'
+      preLoaderRoute: typeof AdminLeaderboardRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
 
 interface AdminRouteChildren {
+  AdminLeaderboardRoute: typeof AdminLeaderboardRoute
   AdminManageRoute: typeof AdminManageRoute
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminLeaderboardRoute: AdminLeaderboardRoute,
   AdminManageRoute: AdminManageRoute,
 }
 

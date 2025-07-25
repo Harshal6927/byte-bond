@@ -4,7 +4,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/compon
 import { NavigationMenu, NavigationMenuItem, NavigationMenuList } from "@/components/ui/navigation-menu"
 import { useUser } from "@/components/user-context"
 import { Link } from "@tanstack/react-router"
-import { LogOut, ShieldUser } from "lucide-react"
+import { ChartBarDecreasing, LogOut, ShieldUser } from "lucide-react"
 
 export function Navbar() {
   const { user, logout } = useUser()
@@ -37,12 +37,20 @@ export function Navbar() {
             <DropdownMenuContent align="start">
               <div className="flex flex-col gap-1">
                 {user.is_admin && (
-                  <Link to="/manage">
-                    <Button type="button" variant="ghost" size="sm" className="justify-start gap-2">
-                      <ShieldUser />
-                      Admin
-                    </Button>
-                  </Link>
+                  <>
+                    <Link to="/manage">
+                      <Button type="button" variant="ghost" size="sm" className="justify-start gap-2">
+                        <ShieldUser />
+                        Admin
+                      </Button>
+                    </Link>
+                    <Link to="/leaderboard">
+                      <Button type="button" variant="ghost" size="sm" className="justify-start gap-2">
+                        <ChartBarDecreasing />
+                        Leaderboard
+                      </Button>
+                    </Link>
+                  </>
                 )}
                 <Button type="button" variant="ghost" size="sm" onClick={logout} className="justify-start gap-2">
                   <LogOut />

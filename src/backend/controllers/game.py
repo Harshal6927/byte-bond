@@ -105,6 +105,7 @@ class GameController(Controller):
     ) -> Leaderboard:
         event = await event_service.get(event_id)
 
+        # TODO: Top 20 users only
         users = await user_service.list(
             event_id=event_id,
             is_admin=False,
@@ -113,6 +114,8 @@ class GameController(Controller):
                 User.connection_count.desc(),
                 User.name.asc(),
             ],
+            # limit=20,
+            # AttributeError: type object 'User' has no attribute 'limit'
         )
 
         # Create leaderboard entries with rank
