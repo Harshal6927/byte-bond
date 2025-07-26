@@ -1,6 +1,6 @@
 from sqladmin import ModelView
 
-from backend.models import Connection, ConnectionQuestion, Event, Question, User, UserAnswer
+from src.backend.models import Connection, ConnectionQuestion, Event, Question, User, UserAnswer
 
 
 class EventAdminView(ModelView, model=Event):

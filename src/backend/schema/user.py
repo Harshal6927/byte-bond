@@ -3,8 +3,8 @@ from typing import Annotated
 
 from msgspec import UNSET, Meta, Struct, UnsetType
 
-from backend.models import UserStatus
-from backend.schema.user_answer import PostUserAnswer
+from src.backend.models import UserStatus
+from src.backend.schema.user_answer import PostUserAnswer
 
 
 class PostUser(Struct):

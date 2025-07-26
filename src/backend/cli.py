@@ -55,8 +55,8 @@ def create_user(  # noqa: C901, PLR0915
     from rich import get_console
     from rich.table import Table
 
-    from backend.config import sqlalchemy_config
-    from backend.lib.dependencies import provide_event_service, provide_user_service
+    from src.backend.config import sqlalchemy_config
+    from src.backend.lib.dependencies import provide_event_service, provide_user_service
 
     console = get_console()
 
@@ -180,8 +180,8 @@ def create_event(
     import click
     from rich import get_console
 
-    from backend.config import sqlalchemy_config
-    from backend.lib.dependencies import provide_event_service
+    from src.backend.config import sqlalchemy_config
+    from src.backend.lib.dependencies import provide_event_service
 
     console = get_console()
 
@@ -237,8 +237,8 @@ def list_events() -> None:
     from rich import get_console
     from rich.table import Table
 
-    from backend.config import sqlalchemy_config
-    from backend.lib.dependencies import provide_event_service
+    from src.backend.config import sqlalchemy_config
+    from src.backend.lib.dependencies import provide_event_service
 
     console = get_console()
 

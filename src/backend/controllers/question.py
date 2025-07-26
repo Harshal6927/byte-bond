@@ -3,10 +3,10 @@ from litestar import delete, get, patch, post
 from litestar.controller import Controller
 from litestar.di import Provide
 
-from backend.lib.dependencies import provide_question_service
-from backend.lib.services import QuestionService
-from backend.lib.utils import admin_user_guard
-from backend.schema.question import GetQuestion, PatchQuestion, PostQuestion
+from src.backend.lib.dependencies import provide_question_service
+from src.backend.lib.services import QuestionService
+from src.backend.lib.utils import admin_user_guard
+from src.backend.schema.question import GetQuestion, PatchQuestion, PostQuestion
 
 
 class QuestionController(Controller):

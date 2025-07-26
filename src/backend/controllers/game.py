@@ -6,24 +6,24 @@ from litestar.controller import Controller
 from litestar.di import Provide
 from litestar.exceptions import HTTPException, NotAuthorizedException
 
-from backend.lib.dependencies import (
+from src.backend.lib.dependencies import (
     provide_connection_question_service,
     provide_connection_service,
     provide_event_service,
     provide_question_service,
     provide_user_service,
 )
-from backend.lib.services import (
+from src.backend.lib.services import (
     ConnectionQuestionService,
     ConnectionService,
     EventService,
     QuestionService,
     UserService,
 )
-from backend.lib.utils import admin_user_guard
-from backend.models import Connection, ConnectionQuestion, ConnectionStatus, Question, User, UserStatus
-from backend.schema.event import GetEvent
-from backend.schema.game import (
+from src.backend.lib.utils import admin_user_guard
+from src.backend.models import Connection, ConnectionQuestion, ConnectionStatus, Question, User, UserStatus
+from src.backend.schema.event import GetEvent
+from src.backend.schema.game import (
     ConnectionQuestionData,
     GameChatRequest,
     GameQuestionResponse,

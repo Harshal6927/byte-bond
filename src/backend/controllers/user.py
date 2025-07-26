@@ -4,15 +4,15 @@ from litestar.controller import Controller
 from litestar.di import Provide
 from litestar.exceptions import NotAuthorizedException, PermissionDeniedException
 
-from backend.lib.dependencies import (
+from src.backend.lib.dependencies import (
     provide_event_service,
     provide_question_service,
     provide_user_answer_service,
     provide_user_service,
 )
-from backend.lib.services import EventService, QuestionService, UserAnswerService, UserService
-from backend.lib.utils import admin_user_guard
-from backend.schema.user import GetUser, PatchUser, PostUser
+from src.backend.lib.services import EventService, QuestionService, UserAnswerService, UserService
+from src.backend.lib.utils import admin_user_guard
+from src.backend.schema.user import GetUser, PatchUser, PostUser
 
 
 class UserController(Controller):

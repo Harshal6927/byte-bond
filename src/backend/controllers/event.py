@@ -4,10 +4,10 @@ from litestar.controller import Controller
 from litestar.di import Provide
 from litestar.exceptions import PermissionDeniedException
 
-from backend.lib.dependencies import provide_event_service, provide_question_service
-from backend.lib.services import EventService, QuestionService
-from backend.lib.utils import admin_user_guard
-from backend.schema.event import GetEvent, PatchEvent, PostEvent
+from src.backend.lib.dependencies import provide_event_service, provide_question_service
+from src.backend.lib.services import EventService, QuestionService
+from src.backend.lib.utils import admin_user_guard
+from src.backend.schema.event import GetEvent, PatchEvent, PostEvent
 
 MINIMUM_QUESTIONS_REQUIRED = 6
 

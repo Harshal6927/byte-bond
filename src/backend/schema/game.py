@@ -2,7 +2,7 @@ from typing import Annotated
 
 from msgspec import Meta, Struct
 
-from backend.models import UserStatus
+from src.backend.models import UserStatus
 
 
 class GameStartRequest(Struct):

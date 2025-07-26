@@ -4,8 +4,8 @@ from litestar.logging import LoggingConfig
 from litestar.openapi import OpenAPIConfig
 from litestar.openapi.plugins import ScalarRenderPlugin
 
-from backend.cli import CLIPlugin
-from backend.config import (
+from src.backend.cli import CLIPlugin
+from src.backend.config import (
     admin_plugin,
     alchemy_plugin,
     channels_plugin,
@@ -15,14 +15,14 @@ from backend.config import (
     settings,
     vite_plugin,
 )
-from backend.controllers.auth import AuthController
-from backend.controllers.event import EventController
-from backend.controllers.frontend import WebController
-from backend.controllers.game import GameController
-from backend.controllers.question import QuestionController
-from backend.controllers.user import UserController
-from backend.controllers.user_answer import UserAnswerController
-from backend.lib.utils import exception_handler
+from src.backend.controllers.auth import AuthController
+from src.backend.controllers.event import EventController
+from src.backend.controllers.frontend import WebController
+from src.backend.controllers.game import GameController
+from src.backend.controllers.question import QuestionController
+from src.backend.controllers.user import UserController
+from src.backend.controllers.user_answer import UserAnswerController
+from src.backend.lib.utils import exception_handler
 
 app = Litestar(
     debug=settings.debug,

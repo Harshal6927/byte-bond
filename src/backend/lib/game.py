@@ -4,10 +4,10 @@ from itertools import combinations
 
 from saq.types import Context
 
-from backend.config import sqlalchemy_config
-from backend.lib.dependencies import provide_connection_service, provide_event_service, provide_user_service
-from backend.lib.services import ConnectionService, UserService
-from backend.models import Connection, ConnectionStatus, Event, UserStatus
+from src.backend.config import sqlalchemy_config
+from src.backend.lib.dependencies import provide_connection_service, provide_event_service, provide_user_service
+from src.backend.lib.services import ConnectionService, UserService
+from src.backend.models import Connection, ConnectionStatus, Event, UserStatus
 
 MINIMUM_REQUIRED_USERS = 2
 

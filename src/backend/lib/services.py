@@ -3,7 +3,7 @@ from advanced_alchemy.service import (
     SQLAlchemyAsyncRepositoryService,
 )
 
-from backend.models import (
+from src.backend.models import (
     Connection,
     ConnectionQuestion,
     Event,

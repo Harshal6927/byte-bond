@@ -2,7 +2,7 @@ from collections.abc import AsyncGenerator
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.lib.services import (
+from src.backend.lib.services import (
     ConnectionQuestionService,
     ConnectionService,
     EventService,

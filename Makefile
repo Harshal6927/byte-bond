@@ -1,6 +1,7 @@
-.PHONY: start-infra stop-infra lint api-schema build
+.PHONY: start-infra stop-infra start-dev stop-dev lint api-schema build
 
 INFRA_COMPOSE_FILE := containers/docker-compose.infra.yaml
+APP_COMPOSE_FILE := containers/docker-compose.dev.yaml
 
 start-infra:
 	@echo "Starting infrastructure (AlloyDB Omni)... 🔄"
@@ -11,6 +12,18 @@ stop-infra:
 	@echo "Stopping infrastructure... 🔄"
 	docker compose -f $(INFRA_COMPOSE_FILE) down
 	@echo "Infrastructure stopped. ✅"
+
+start-dev:
+	@echo "Starting application... 🔄"
+	docker compose -f $(INFRA_COMPOSE_FILE) up -d
+	docker compose -f $(APP_COMPOSE_FILE) up --build
+	@echo "Application started. ✅"
+
+stop-dev:
+	@echo "Stopping application... 🔄"
+	docker compose -f $(APP_COMPOSE_FILE) down
+	docker compose -f $(INFRA_COMPOSE_FILE) down
+	@echo "Application stopped. ✅"
 
 lint:
 	@echo "Running linters... 🔄"

@@ -15,7 +15,7 @@ from litestar_saq import CronJob, QueueConfig, SAQConfig, SAQPlugin
 from litestar_vite import ViteConfig, VitePlugin
 from sqladmin_litestar_plugin import SQLAdminPlugin
 
-from backend.lib.admin import (
+from src.backend.lib.admin import (
     ConnectionAdminView,
     ConnectionQuestionAdminView,
     EventAdminView,
@@ -23,9 +23,9 @@ from backend.lib.admin import (
     UserAdminView,
     UserAnswerAdminView,
 )
-from backend.lib.dependencies import provide_user_service
-from backend.models import User
-from backend.settings import get_settings
+from src.backend.lib.dependencies import provide_user_service
+from src.backend.models import User
+from src.backend.settings import get_settings
 
 settings = get_settings()
 
@@ -108,7 +108,7 @@ saq_plugin = SAQPlugin(
                 },
                 scheduled_tasks=[
                     CronJob(
-                        function="backend.lib.game.process_game",
+                        function="src.backend.lib.game.process_game",
                         cron="* * * * *",
                         timeout=60,
                         ttl=2000,

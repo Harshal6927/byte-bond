@@ -2,7 +2,7 @@ import anyio
 from litestar import Controller, MediaType, Response, get
 from litestar.status_codes import HTTP_200_OK
 
-from backend.settings import get_settings
+from src.backend.settings import get_settings
 
 
 class WebController(Controller):

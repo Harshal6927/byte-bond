@@ -3,11 +3,11 @@ from litestar.controller import Controller
 from litestar.datastructures import Cookie
 from litestar.di import Provide
 
-from backend.config import jwt_cookie_auth
-from backend.lib.dependencies import provide_event_service, provide_user_service
-from backend.lib.services import EventService, UserService
-from backend.schema.auth import PostLogin
-from backend.schema.user import GetUser
+from src.backend.config import jwt_cookie_auth
+from src.backend.lib.dependencies import provide_event_service, provide_user_service
+from src.backend.lib.services import EventService, UserService
+from src.backend.schema.auth import PostLogin
+from src.backend.schema.user import GetUser
 
 
 class AuthController(Controller):
