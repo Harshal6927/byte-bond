@@ -44,7 +44,7 @@ app = Litestar(
         render_plugins=[ScalarRenderPlugin()],
     ),
     logging_config=LoggingConfig(
-        disable_stack_trace={400, 401, 403, 404, 405, NotFoundError, DuplicateKeyError},
+        disable_stack_trace={400, 401, 403, 404, 405, 429, NotFoundError, DuplicateKeyError},
     ),
     exception_handlers={
         Exception: exception_handler,

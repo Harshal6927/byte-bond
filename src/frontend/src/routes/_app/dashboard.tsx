@@ -203,15 +203,6 @@ function DashboardPage() {
           {gameStatus.user_status === "connecting" && <Connecting gameStatus={gameStatus} user={user} />}
           {gameStatus.user_status === "busy" && <Busy gameStatus={gameStatus} />}
         </div>
-
-        {/* WebSocket Connection Status - Only show in development */}
-        {process.env.NODE_ENV === "development" && (
-          <div className="fixed top-2 right-2 z-50">
-            <div className={`rounded-full px-2 py-1 text-xs ${isConnectedToWS ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
-              WS: {isConnectedToWS ? "Connected" : "Disconnected"}
-            </div>
-          </div>
-        )}
       </div>
     )
   }

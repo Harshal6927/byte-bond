@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { createFileRoute } from "@tanstack/react-router"
 import { Award, Crown, Medal, Moon, Sparkles, Sun, Target, Trophy, Users, Zap } from "lucide-react"
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 export const Route = createFileRoute("/_admin/leaderboard")({
   component: LeaderboardPage,
@@ -20,6 +20,7 @@ function LeaderboardPage() {
   const [eventsLoading, setEventsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const { theme, toggleTheme } = useTheme()
+  const intervalRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -38,8 +39,10 @@ function LeaderboardPage() {
     fetchEvents()
   }, [])
 
-  const fetchLeaderboard = async (eventId: number) => {
-    setLoading(true)
+  const fetchLeaderboard = async (eventId: number, showLoading = true) => {
+    if (showLoading) {
+      setLoading(true)
+    }
     setError(null)
 
     const response = await apiGameLeaderboardEventIdGetLeaderboard({
@@ -52,8 +55,30 @@ function LeaderboardPage() {
       setError("Failed to fetch leaderboard data")
     }
 
-    setLoading(false)
+    if (showLoading) {
+      setLoading(false)
+    }
   }
+
+  // Auto-refresh effect for leaderboard
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+  useEffect(() => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current)
+    }
+
+    if (selectedEventId && leaderboard) {
+      intervalRef.current = setInterval(() => {
+        fetchLeaderboard(Number.parseInt(selectedEventId), false) // Don't show loading for auto-refresh
+      }, 30000) // 30 seconds
+    }
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current)
+      }
+    }
+  }, [selectedEventId, leaderboard])
 
   const handleEventSelect = (eventId: string) => {
     setSelectedEventId(eventId)

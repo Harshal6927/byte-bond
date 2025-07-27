@@ -246,10 +246,11 @@ export function Connecting({ gameStatus, user }: ConnectingProps) {
       {/* Partner Info */}
       {gameStatus.partner_name && (
         <Card className="rounded-2xl border border-purple-300 p-4 shadow-sm">
-          <div className="text-center">
-            <Users className="mx-auto mb-2 h-8 w-8 text-purple-600" />
-            <h3 className="mb-1 font-semibold text-base text-gray-300">Your Partner</h3>
-            <p className="font-bold text-purple-700 text-xl">{gameStatus.partner_name}</p>
+          <div className="flex items-center justify-center gap-4">
+            <Users className="h-6 w-6 flex-shrink-0 text-purple-600" />
+            <span className="font-semibold text-base text-gray-300">
+              Your Partner <span className="font-bold text-lg text-purple-700">{gameStatus.partner_name}</span>
+            </span>
           </div>
         </Card>
       )}

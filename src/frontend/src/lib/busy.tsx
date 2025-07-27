@@ -1,4 +1,5 @@
 import { type GameStatus, type QuestionResult, apiGameAnswerQuestionAnswerQuestion, apiGameCompleteConnectionCompleteConnection } from "@/client"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -93,9 +94,9 @@ export function Busy({ gameStatus: initialGameStatus }: BusyProps) {
       // Clear the answer input
       setAnswers((prev) => ({ ...prev, [questionId]: "" }))
 
-      // Start 30-second cooldown
-      setCooldownEnd(Date.now() + 30000)
-      setCooldownSeconds(30)
+      // Start 60-second cooldown
+      setCooldownEnd(Date.now() + 60000)
+      setCooldownSeconds(60)
     } else {
       toast.error("Failed to submit answer", {
         description: response.error?.detail || "Please try again",
@@ -129,6 +130,19 @@ export function Busy({ gameStatus: initialGameStatus }: BusyProps) {
 
   return (
     <div className="relative space-y-6 p-4 sm:p-6">
+      {/* Cooldown Alert */}
+      {isCooldownActive && (
+        <div className="-translate-x-1/2 fixed top-1 left-1/2 z-50 w-full max-w-md px-1">
+          <Alert className="border-orange-300 shadow-lg">
+            <AlertTitle className="flex items-center justify-center gap-2 font-bold text-orange-700">
+              <Timer className="h-4 w-4" />
+              Cooldown
+            </AlertTitle>
+            <AlertDescription className="flex items-center justify-center text-orange-700">Wait {cooldownSeconds} seconds before answering another question</AlertDescription>
+          </Alert>
+        </div>
+      )}
+
       {/* Status Header */}
       <Card className="rounded-2xl border border-red-300 p-6 text-center shadow-sm">
         <div>
@@ -145,24 +159,14 @@ export function Busy({ gameStatus: initialGameStatus }: BusyProps) {
         </div>
       </Card>
 
-      {/* Cooldown Timer */}
-      {isCooldownActive && (
-        <Card className="rounded-2xl border border-orange-300 bg-orange-50 p-4 text-center shadow-sm">
-          <div className="flex items-center justify-center gap-2">
-            <Timer className="h-5 w-5 text-orange-600" />
-            <span className="font-semibold text-orange-800">Cooldown: {cooldownSeconds} seconds</span>
-          </div>
-          <p className="text-orange-600 text-sm">Wait before answering another question</p>
-        </Card>
-      )}
-
       {/* Partner Info */}
       {gameStatus.partner_name && (
         <Card className="rounded-2xl border border-purple-300 p-4 shadow-sm">
-          <div className="text-center">
-            <Users className="mx-auto mb-2 h-8 w-8 text-purple-600" />
-            <h3 className="mb-1 font-semibold text-base text-gray-300">Playing with</h3>
-            <p className="font-bold text-purple-700 text-xl">{gameStatus.partner_name}</p>
+          <div className="flex items-center justify-center gap-4">
+            <Users className="h-6 w-6 flex-shrink-0 text-purple-600" />
+            <span className="font-semibold text-base text-gray-300">
+              Playing with <span className="font-bold text-lg text-purple-700">{gameStatus.partner_name}</span>
+            </span>
           </div>
         </Card>
       )}

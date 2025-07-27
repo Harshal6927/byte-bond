@@ -72,7 +72,7 @@ jwt_cookie_auth = JWTCookieAuth[User](
     retrieve_user_handler=_retrieve_user_handler,
     token_secret=settings.secret_key,
     default_token_expiration=timedelta(days=1),
-    exclude=["/schema", "/web", "/saq"],
+    exclude=["/schema", "/saq"],
     samesite="strict",
     secure=True,
 )

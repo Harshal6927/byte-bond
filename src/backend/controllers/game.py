@@ -5,6 +5,7 @@ from litestar import Request, get, post, status_codes
 from litestar.controller import Controller
 from litestar.di import Provide
 from litestar.exceptions import HTTPException, NotAuthorizedException
+from litestar.middleware.rate_limit import RateLimitConfig
 
 from src.backend.lib.dependencies import (
     provide_connection_question_service,
@@ -40,6 +41,7 @@ if TYPE_CHECKING:
     from litestar.channels.plugin import ChannelsPlugin
 
 GAME_QUESTIONS_COUNT = 6
+RATE_LIMIT = RateLimitConfig(rate_limit=("minute", 1), store="connection_answer_rate_limit")
 
 
 class GameController(Controller):
@@ -251,7 +253,8 @@ class GameController(Controller):
             request=request,
         )
 
-    @post("/answer-question")
+    # TODO: set rate limiter by user and not the ip
+    @post("/answer-question", middleware=[RATE_LIMIT.middleware], no_app_rate_limit=True)
     async def answer_question(
         self,
         data: GameQuestionResponse,
