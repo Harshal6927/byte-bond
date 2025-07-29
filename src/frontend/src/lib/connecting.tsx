@@ -35,6 +35,7 @@ export function Connecting({ gameStatus, user }: ConnectingProps) {
   const [unreadCount, setUnreadCount] = useState(0)
   const socketRef = useRef<WebSocket | null>(null)
   const chatEndRef = useRef<HTMLDivElement>(null)
+  const qrLockRef = useRef<boolean>(false)
 
   // WebSocket connection
   useEffect(() => {
@@ -175,21 +176,36 @@ export function Connecting({ gameStatus, user }: ConnectingProps) {
   }
 
   const handleQRDetected = async (qrData: string) => {
-    const response = await apiGameScanQrScanQrCode({
-      body: {
-        qr_code: qrData,
-      },
-    })
-
-    if (response.status === 201) {
-      toast.success("You have connected with your partner!")
-    } else {
-      toast.error("Failed to scan QR code", {
-        description: response.error?.detail,
-      })
+    if (qrLockRef.current) {
+      return
     }
 
-    stopScanning()
+    qrLockRef.current = true
+
+    try {
+      const response = await apiGameScanQrScanQrCode({
+        body: {
+          qr_code: qrData,
+        },
+      })
+
+      if (response.status === 201) {
+        toast.success("You have connected with your partner!")
+      } else {
+        toast.error("Failed to scan QR code", {
+          description: response.error?.detail,
+        })
+      }
+
+      stopScanning()
+    } catch (error) {
+      toast.error("Error processing QR code")
+    }
+
+    // Release the lock after 2.5 seconds
+    setTimeout(() => {
+      qrLockRef.current = false
+    }, 2500)
   }
 
   const handleScanClick = () => {
@@ -370,6 +386,15 @@ export function Connecting({ gameStatus, user }: ConnectingProps) {
           </div>
         </div>
       </Card>
+
+      {/* DEBUG */}
+      {/* <Button
+        onClick={() => {
+          handleQRDetected("0c809ef03b4540518e8868d98c450198")
+        }}
+      >
+        Make Connection
+      </Button> */}
 
       {/* Floating Chat Button - Only show if we have a partner */}
       {gameStatus.partner_name && (
