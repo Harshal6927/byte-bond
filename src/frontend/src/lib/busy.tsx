@@ -77,10 +77,10 @@ export function Busy({ gameStatus: initialGameStatus }: BusyProps) {
       setQuestionResults((prev) => ({ ...prev, [questionId]: result }))
 
       // Update the gameStatus to reflect the answered question
-      setGameStatus((prev) => ({
-        ...prev,
+      const updatedGameStatus = {
+        ...gameStatus,
         connection_questions:
-          prev.connection_questions?.map((q) =>
+          gameStatus.connection_questions?.map((q) =>
             q.question_id === questionId
               ? {
                   ...q,
@@ -89,14 +89,19 @@ export function Busy({ gameStatus: initialGameStatus }: BusyProps) {
                 }
               : q,
           ) || [],
-      }))
+      }
+
+      setGameStatus(updatedGameStatus)
 
       // Clear the answer input
       setAnswers((prev) => ({ ...prev, [questionId]: "" }))
 
-      // Start 60-second cooldown
-      setCooldownEnd(Date.now() + 60000)
-      setCooldownSeconds(60)
+      // Only start cooldown if there are still questions to answer
+      const unansweredQuestions = updatedGameStatus.connection_questions?.filter((q) => !q.question_answered) || []
+      if (unansweredQuestions.length > 0) {
+        setCooldownEnd(Date.now() + 60000)
+        setCooldownSeconds(60)
+      }
     } else {
       toast.error("Failed to submit answer", {
         description: response.error?.detail || "Please try again",
