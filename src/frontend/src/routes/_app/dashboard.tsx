@@ -18,7 +18,7 @@ function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isConnectedToWS, setIsConnectedToWS] = useState(false)
-  const { user } = useUser()
+  const { user, getUser } = useUser()
   const socketRef = useRef<WebSocket | null>(null)
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
   const isPollingRef = useRef(true)
@@ -70,6 +70,7 @@ function DashboardPage() {
     socket.addEventListener("message", (event) => {
       const data = JSON.parse(event.data)
       if (data.message === `refresh-${user.id}`) {
+        getUser()
         fetchGameStatus()
       }
     })
@@ -89,7 +90,7 @@ function DashboardPage() {
       socket.close()
       socketRef.current = null
     }
-  }, [user, fetchGameStatus])
+  }, [user, getUser, fetchGameStatus])
 
   // Initial fetch on component mount
   useEffect(() => {
@@ -164,11 +165,11 @@ function DashboardPage() {
   // Loading state
   if (isLoading && !gameStatus) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="p-8 text-center">
-          <div className="mx-auto mb-6 h-12 w-12 animate-spin rounded-full border-4 border-purple-200 border-t-purple-600" />
-          <h2 className="mb-2 font-semibold text-gray-900 text-lg">Loading ByteBond</h2>
-          <p className="text-gray-600">Getting your game status...</p>
+      <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center p-4">
+        <div className="text-center">
+          <div className="mx-auto mb-6 h-16 w-16 animate-spin rounded-full border-4 border-purple-400 border-t-transparent" />
+          <h2 className="mb-2 font-semibold text-slate-200 text-xl">Loading ByteBond</h2>
+          <p className="text-slate-400">Getting your game status...</p>
         </div>
       </div>
     )
@@ -177,15 +178,15 @@ function DashboardPage() {
   // Error state
   if (error && !gameStatus) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="max-w-sm text-center">
-          <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-red-100">
-            <RefreshCw className="h-8 w-8 text-red-600" />
+      <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center p-4">
+        <div className="w-full max-w-sm text-center">
+          <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-red-500/10 ring-1 ring-red-500/20">
+            <RefreshCw className="h-8 w-8 text-red-400" />
           </div>
-          <h2 className="mb-2 font-semibold text-gray-900 text-lg">Connection Error</h2>
-          <p className="mb-6 text-gray-600">{error}</p>
-          <Button onClick={handleRefresh} className="w-full bg-gradient-to-r from-purple-600 to-pink-600 py-3 font-semibold text-white hover:from-purple-700 hover:to-pink-700">
-            <RefreshCw className="mr-2 h-4 w-4" />
+          <h2 className="mb-2 font-semibold text-slate-200 text-xl">Connection Error</h2>
+          <p className="mb-6 text-slate-400">{error}</p>
+          <Button onClick={handleRefresh} className="w-full bg-gradient-to-r from-purple-500 to-purple-700 py-3 font-semibold text-white hover:from-purple-600 hover:to-purple-800">
+            <RefreshCw className="h-4 w-4" />
             Try Again
           </Button>
         </div>
@@ -196,10 +197,9 @@ function DashboardPage() {
   // Render status-specific component
   if (gameStatus && user) {
     return (
-      <div className="min-h-screen">
-        {/* Main content */}
+      <div className="min-h-[calc(100vh-4rem)]">
         <div className="mx-auto max-w-md">
-          {gameStatus.user_status === "available" && <Available />}
+          {gameStatus.user_status === "available" && <Available user={user} />}
           {gameStatus.user_status === "connecting" && <Connecting gameStatus={gameStatus} user={user} />}
           {gameStatus.user_status === "busy" && <Busy gameStatus={gameStatus} />}
         </div>

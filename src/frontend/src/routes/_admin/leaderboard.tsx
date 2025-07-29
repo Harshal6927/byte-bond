@@ -1,11 +1,10 @@
 import { type GetEvent, type Leaderboard, apiEventsGetEvents, apiGameLeaderboardEventIdGetLeaderboard } from "@/client"
-import { useTheme } from "@/components/theme-context"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { createFileRoute } from "@tanstack/react-router"
-import { Award, Crown, Medal, Moon, Sparkles, Sun, Target, Trophy, Users, Zap } from "lucide-react"
+import { Award, Crown, Medal, Sparkles, Target, Trophy, Users, Zap } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 
 export const Route = createFileRoute("/_admin/leaderboard")({
@@ -19,7 +18,6 @@ function LeaderboardPage() {
   const [loading, setLoading] = useState(false)
   const [eventsLoading, setEventsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const { theme, toggleTheme } = useTheme()
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
@@ -133,7 +131,7 @@ function LeaderboardPage() {
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-muted/20">
       {/* Header with Theme Toggle */}
       <div className="border-b bg-gradient-to-r from-card via-card to-card/95 shadow-sm backdrop-blur-sm">
-        <div className="container mx-auto px-6 py-6">
+        <div className="mx-auto px-6 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary/80 shadow-lg">
@@ -147,24 +145,11 @@ function LeaderboardPage() {
                 </p>
               </div>
             </div>
-            <Button variant="outline" size="lg" onClick={toggleTheme} className="gap-2 bg-transparent shadow-sm transition-all hover:shadow-md">
-              {theme === "dark" ? (
-                <>
-                  <Sun className="h-4 w-4" />
-                  Light Mode
-                </>
-              ) : (
-                <>
-                  <Moon className="h-4 w-4" />
-                  Dark Mode
-                </>
-              )}
-            </Button>
           </div>
         </div>
       </div>
 
-      <div className="container mx-auto space-y-8 px-6 py-8">
+      <div className="mx-auto space-y-8 px-6 py-8">
         {/* Event Selection */}
         <Card className="border-0 bg-gradient-to-r from-card to-card/95 shadow-lg">
           <CardHeader className="pb-4">

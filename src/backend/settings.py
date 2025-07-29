@@ -24,7 +24,7 @@ class ViteSettings:
     )
     root_dir: Path = Path(__file__).parent.parent / "frontend"
     resource_dir: Path = Path(__file__).parent.parent / "frontend" / "src"
-    bundle_dir: Path = Path(__file__).parent / "web" / "static"
+    bundle_dir: Path = Path(__file__).parent / "web"
     asset_url: Path = "/static/"
 
 

@@ -227,45 +227,48 @@ export function Connecting({ gameStatus, user }: ConnectingProps) {
   }
 
   return (
-    <div className="relative space-y-6 p-4 sm:p-6">
+    <div className="space-y-6 p-4">
       {/* Status Header */}
-      <Card className="rounded-2xl border border-yellow-300 p-6 text-center shadow-sm">
-        <div className="mb-4">
-          <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-yellow-100/60">
-            {isQrGiver ? <QrCodeIcon className="h-8 w-8 text-yellow-100" /> : <Scan className="h-8 w-8 text-yellow-100" />}
+      <Card className="border-amber-500/20 bg-gradient-to-br from-amber-500/10 to-orange-500/10 p-6 text-center backdrop-blur-sm">
+        <div>
+          <div className="mx-auto mb-4 flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-amber-400 to-orange-500 shadow-lg">
+            {isQrGiver ? <QrCodeIcon className="h-10 w-10 text-white" /> : <Scan className="h-10 w-10 text-white" />}
           </div>
-          <h2 className="mb-2 font-bold text-xl text-yellow-600">{isQrGiver ? "Show Your QR Code" : "Scan QR Code"}</h2>
-          <p className="text-sm text-yellow-700">{isQrGiver ? "Present this QR code to your partner" : "Find your partner and scan their QR code"}</p>
+          <h2 className="font-bold text-2xl text-amber-400">{isQrGiver ? "Show Your QR Code" : "Scan QR Code"}</h2>
+          <p className="text-amber-200/80 text-sm leading-relaxed">{isQrGiver ? "Present this QR code to your partner" : "Find your partner and scan their QR code"}</p>
         </div>
-        <div className="inline-flex items-center gap-2 rounded-full bg-yellow-100 px-4 py-2 font-medium text-sm text-yellow-800">
-          <div className="h-2 w-2 animate-pulse rounded-full bg-yellow-500" />
+        <div className="inline-flex items-center gap-2 rounded-full bg-amber-500/20 px-4 py-2 font-medium text-amber-300 text-sm backdrop-blur-sm">
+          <div className="h-2 w-2 animate-pulse rounded-full bg-amber-400" />
           Connecting
         </div>
       </Card>
 
       {/* Partner Info */}
       {gameStatus.partner_name && (
-        <Card className="rounded-2xl border border-purple-300 p-4 shadow-sm">
+        <Card className="border-purple-500/20 bg-gradient-to-br from-purple-500/10 to-purple-700/10 p-4 backdrop-blur-sm">
           <div className="flex items-center justify-center gap-4">
-            <Users className="h-6 w-6 flex-shrink-0 text-purple-600" />
-            <span className="font-semibold text-base text-gray-300">
-              Your Partner <span className="font-bold text-lg text-purple-700">{gameStatus.partner_name}</span>
-            </span>
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-purple-400 to-purple-600">
+              <Users className="h-6 w-6 text-white" />
+            </div>
+            <div className="text-center">
+              <p className="text-slate-300 text-sm">Your Partner</p>
+              <p className="font-bold text-lg text-purple-400">{gameStatus.partner_name}</p>
+            </div>
           </div>
         </Card>
       )}
 
       {/* QR Code Display */}
       {isQrGiver && gameStatus.qr_code && (
-        <Card className="rounded-2xl p-6 shadow-sm">
-          <div className="flex flex-col items-center justify-center">
-            <h3 className="mb-4 flex items-center justify-center gap-2 font-semibold text-base text-gray-300">
-              <QrCodeIcon className="h-5 w-5" />
+        <Card className="border-slate-700/50 bg-slate-800/50 p-6 backdrop-blur-sm">
+          <div className="text-center">
+            <h3 className="mb-6 flex items-center justify-center gap-2 font-semibold text-lg text-slate-200">
+              <QrCodeIcon className="h-5 w-5 text-purple-400" />
               Your QR Code
             </h3>
             {/* QR Code */}
-            <div className="rounded-xl bg-gray-100 p-3 shadow-md">
-              <QRCode value={gameStatus.qr_code} size={160} />
+            <div className="mx-auto mb-4 w-fit rounded-2xl bg-white p-4 shadow-xl">
+              <QRCode value={gameStatus.qr_code} size={200} />
             </div>
           </div>
         </Card>
@@ -273,53 +276,60 @@ export function Connecting({ gameStatus, user }: ConnectingProps) {
 
       {/* QR Scanner */}
       {!isQrGiver && (
-        <Card className="rounded-2xl p-6 shadow-sm">
+        <Card className="border-slate-700/50 bg-slate-800/50 p-6 backdrop-blur-sm">
           <div className="text-center">
-            <h3 className="mb-4 flex items-center justify-center gap-2 font-semibold text-base text-gray-300">
-              <Camera className="h-5 w-5" />
+            <h3 className="mb-6 flex items-center justify-center gap-2 font-semibold text-lg text-slate-200">
+              <Camera className="h-5 w-5 text-purple-400" />
               {isScanning ? "Scanning..." : "Ready to Scan"}
             </h3>
+
             {/* Camera Permission Denied */}
             {hasPermission === false && (
-              <div className="mb-4 rounded-xl border-2 border-red-300 bg-red-50 p-4 shadow-inner">
+              <div className="mb-6 rounded-xl border border-red-500/20 bg-red-500/10 p-6">
                 <div className="text-center">
-                  <X className="mx-auto mb-2 h-8 w-8 text-red-500" />
-                  <p className="mb-2 text-red-700 text-sm">Camera access denied or not available</p>
-                  <p className="text-red-600 text-xs">Please enable camera permissions in your browser settings</p>
+                  <X className="mx-auto mb-3 h-12 w-12 text-red-400" />
+                  <p className="mb-2 font-medium text-red-300">Camera access denied or not available</p>
+                  <p className="text-red-400/80 text-sm">Please enable camera permissions in your browser settings</p>
                 </div>
               </div>
             )}
+
             {/* Camera Scanner View */}
             {isScanning && (
-              <div className="relative mb-4 overflow-hidden rounded-lg border-2 border-purple-300 shadow-md">
-                <video ref={videoRef} className="mx-auto w-full max-w-sm" style={{ maxHeight: "300px" }}>
+              <div className="relative mb-6 overflow-hidden rounded-xl border border-purple-500/20 shadow-lg">
+                <video ref={videoRef} className="mx-auto w-full max-w-sm rounded-xl" style={{ maxHeight: "300px" }}>
                   <track kind="captions" srcLang="en" label="English captions" />
                 </video>
+                <div className="absolute inset-0 rounded-xl ring-2 ring-purple-500/50 ring-offset-2 ring-offset-slate-800" />
               </div>
             )}
+
             {/* Default Scanner Instructions */}
             {!isScanning && hasPermission !== false && (
-              <div className="mb-4 rounded-xl border-2 border-gray-300 border-dashed bg-gray-50 p-6 shadow-inner">
-                <Scan className="mx-auto mb-3 h-12 w-12 text-gray-400" />
-                <p className="text-gray-500 text-sm">Find your partner and scan their QR code</p>
+              <div className="mb-6 rounded-xl border border-slate-600 border-dashed bg-slate-700/30 p-8">
+                <Scan className="mx-auto mb-4 h-16 w-16 text-slate-400" />
+                <p className="font-medium text-slate-300">Find your partner and scan their QR code</p>
               </div>
             )}
+
             <Button
               onClick={handleScanClick}
-              className={`w-full rounded-lg py-3 font-semibold text-base text-white transition-all duration-200 ${
-                isScanning ? "bg-red-600 hover:bg-red-700" : "bg-gradient-to-r from-blue-600 to-purple-700 hover:from-blue-700 hover:to-purple-800"
+              className={`w-full py-3 font-semibold text-base transition-all duration-200 ${
+                isScanning
+                  ? "bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700"
+                  : "bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
               }`}
               disabled={hasPermission === false}
             >
               {isScanning ? (
                 <>
-                  <X className="mr-2 h-4 w-4" />
+                  <X className="h-4 w-4" />
                   Stop Scanning
                 </>
               ) : (
                 <>
-                  <Camera className="mr-2 h-4 w-4" />
-                  Start Scanning
+                  <Camera className="h-4 w-4" />
+                  Scan
                 </>
               )}
             </Button>
@@ -328,28 +338,34 @@ export function Connecting({ gameStatus, user }: ConnectingProps) {
       )}
 
       {/* Instructions */}
-      <Card className="rounded-2xl p-6 shadow-sm">
-        <h3 className="text-center font-semibold text-base text-gray-300">What's Next?</h3>
+      <Card className="border-slate-700/50 bg-slate-800/50 p-6 backdrop-blur-sm">
+        <h3 className="text-center font-semibold text-lg text-slate-200">What's Next?</h3>
         <div className="space-y-4">
-          <div className="flex items-start gap-3">
-            <div className="mt-0.5 flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-purple-100 font-bold text-purple-600 text-sm shadow-sm">1</div>
+          <div className="flex items-start gap-4">
+            <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-purple-700 font-bold text-sm text-white shadow-sm">
+              1
+            </div>
             <div>
-              <p className="font-medium text-gray-300 text-sm">Connect with your partner</p>
-              <p className="text-gray-500 text-xs">{isQrGiver ? "Show your QR code" : "Scan their QR code"}</p>
+              <p className="font-medium text-slate-300">Connect with your partner</p>
+              <p className="text-slate-400 text-sm">{isQrGiver ? "Show your QR code" : "Scan their QR code"}</p>
             </div>
           </div>
-          <div className="flex items-start gap-3">
-            <div className="mt-0.5 flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-purple-100 font-bold text-purple-600 text-sm shadow-sm">2</div>
+          <div className="flex items-start gap-4">
+            <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-purple-700 font-bold text-sm text-white shadow-sm">
+              2
+            </div>
             <div>
-              <p className="font-medium text-gray-300 text-sm">Answer questions</p>
-              <p className="text-gray-500 text-xs">Learn about each other through fun questions</p>
+              <p className="font-medium text-slate-300">Answer questions</p>
+              <p className="text-slate-400 text-sm">Learn about each other through fun questions</p>
             </div>
           </div>
-          <div className="flex items-start gap-3">
-            <div className="mt-0.5 flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-purple-100 font-bold text-purple-600 text-sm shadow-sm">3</div>
+          <div className="flex items-start gap-4">
+            <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-purple-700 font-bold text-sm text-white shadow-sm">
+              3
+            </div>
             <div>
-              <p className="font-medium text-gray-300 text-sm">Earn points</p>
-              <p className="text-gray-500 text-xs">Get points for correct answers</p>
+              <p className="font-medium text-slate-300">Earn points</p>
+              <p className="text-slate-400 text-sm">Get points for correct answers</p>
             </div>
           </div>
         </div>
@@ -360,40 +376,44 @@ export function Connecting({ gameStatus, user }: ConnectingProps) {
         <Drawer open={isChatOpen} onOpenChange={setIsChatOpen}>
           <DrawerTrigger asChild>
             <div className="fixed right-4 bottom-4 z-50">
-              <Button className="relative h-12 w-12 rounded-full bg-gradient-to-r from-blue-600 to-purple-700 p-0 shadow-lg transition-all duration-200 hover:from-blue-700 hover:to-purple-800 hover:shadow-xl">
+              <Button className="relative h-14 w-14 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 p-0 shadow-xl transition-all duration-200 hover:scale-105 hover:from-blue-600 hover:to-purple-700 hover:shadow-2xl">
                 <MessageCircle className="h-6 w-6 text-white" />
                 {/* Unread message count indicator */}
                 {unreadCount > 0 && (
-                  <div className="-right-1 -top-1 absolute flex h-5 w-5 items-center justify-center rounded-full border border-white bg-red-500">
+                  <div className="-right-1 -top-1 absolute flex h-6 w-6 items-center justify-center rounded-full border-2 border-slate-800 bg-red-500">
                     <span className="font-bold text-white text-xs">{unreadCount > 9 ? "9+" : unreadCount}</span>
                   </div>
                 )}
               </Button>
             </div>
           </DrawerTrigger>
-          <DrawerContent className="flex h-[85vh] flex-col">
-            <DrawerHeader className="p-4 text-white shadow-md">
+          <DrawerContent className="flex h-[85vh] flex-col border-slate-700 bg-slate-900">
+            <DrawerHeader className="border-slate-700 border-b bg-gradient-to-r from-blue-600 to-purple-600 p-4">
               <div className="flex items-center">
                 <div className="text-left">
                   <DrawerTitle className="font-semibold text-lg text-white">Chat with {gameStatus.partner_name}</DrawerTitle>
-                  <p className="text-xs opacity-90">{isConnectedToWS ? "Connected" : "Connecting..."}</p>
+                  <p className="text-blue-100/80 text-xs">{isConnectedToWS ? "Connected" : "Connecting..."}</p>
                 </div>
               </div>
             </DrawerHeader>
             {/* Chat Messages */}
             <div className="flex-1 overflow-y-auto p-4 pb-20">
               {messages.length === 0 ? (
-                <div className="flex h-full flex-col items-center justify-center text-center text-gray-500">
-                  <MessageCircle className="mb-4 h-16 w-16 text-gray-300" />
-                  <h3 className="mb-2 font-semibold text-lg">Start chatting!</h3>
-                  <p className="text-gray-500 text-sm">Coordinate with your partner to find each other's location.</p>
+                <div className="flex h-full flex-col items-center justify-center text-center">
+                  <MessageCircle className="mb-4 h-16 w-16 text-slate-600" />
+                  <h3 className="mb-2 font-semibold text-lg text-slate-300">Start chatting!</h3>
+                  <p className="text-slate-400 text-sm">Coordinate with your partner to find each other's location.</p>
                 </div>
               ) : (
                 <div className="space-y-4">
                   {messages.map((message, idx) => (
                     // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
                     <div key={message.message + idx} className={`flex ${!message.isPartner ? "justify-end" : "justify-start"}`}>
-                      <div className={`max-w-[80%] rounded-xl px-4 py-2 shadow-sm ${!message.isPartner ? "bg-blue-500 text-white" : "bg-gray-100 text-gray-900"}`}>
+                      <div
+                        className={`max-w-[80%] rounded-2xl px-4 py-3 shadow-sm ${
+                          !message.isPartner ? "bg-gradient-to-r from-blue-500 to-purple-600 text-white" : "border border-slate-600 bg-slate-700 text-slate-200"
+                        }`}
+                      >
                         <p className="break-words text-sm">{message.message}</p>
                       </div>
                     </div>
@@ -403,7 +423,7 @@ export function Connecting({ gameStatus, user }: ConnectingProps) {
               )}
             </div>
             {/* Chat Input - Fixed at bottom */}
-            <div className="absolute right-0 bottom-0 left-0 border-t bg-background p-4 shadow-lg">
+            <div className="absolute right-0 bottom-0 left-0 border-slate-700 border-t bg-slate-900 p-4">
               <div className="flex items-end gap-3">
                 <Input
                   type="text"
@@ -411,11 +431,16 @@ export function Connecting({ gameStatus, user }: ConnectingProps) {
                   onChange={(e) => setNewMessage(e.target.value)}
                   onKeyDown={handleKeyPress}
                   placeholder="Type a message..."
-                  className="flex-1 rounded-full border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:ring-2"
+                  className="flex-1 border-slate-600 bg-slate-800 text-white placeholder:text-slate-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
                   disabled={!isConnectedToWS}
                 />
-                <Button onClick={sendMessage} disabled={!newMessage.trim() || !isConnectedToWS} size="icon" className="rounded-full">
-                  <Send className="h-5 w-5 text-white" />
+                <Button
+                  onClick={sendMessage}
+                  disabled={!newMessage.trim() || !isConnectedToWS}
+                  size="icon"
+                  className="h-10 w-10 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
+                >
+                  <Send className="h-4 w-4 text-white" />
                 </Button>
               </div>
             </div>

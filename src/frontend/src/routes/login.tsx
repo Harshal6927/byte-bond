@@ -37,27 +37,26 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br p-3 sm:p-4 md:p-6">
-      <div className="w-full max-w-sm sm:max-w-md">
-        <Card className="w-full border-0 shadow-2xl backdrop-blur-sm">
-          <CardHeader className="space-y-3 px-4 pt-6 pb-4 text-center sm:px-6 sm:pt-8">
-            <CardTitle className="font-bold text-2xl leading-tight sm:text-3xl">
-              Welcome Back to
-              <br className="sm:hidden" />
-              <span className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent sm:ml-2">ByteBond!</span>
-            </CardTitle>
-            <CardDescription className="px-2 text-sm leading-relaxed sm:text-base">Sign in to your account.</CardDescription>
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-4">
+      <div className="w-full max-w-sm">
+        <Card className="border-0 bg-gradient-to-b from-slate-800/90 to-slate-900/90 shadow-2xl backdrop-blur-xl">
+          <CardHeader className="space-y-4 px-6 pt-8 pb-6 text-center">
+            <div className="mx-auto mb-2 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-purple-500 to-purple-700 shadow-lg">
+              <span className="font-bold text-2xl text-white">B</span>
+            </div>
+            <CardTitle className="bg-gradient-to-r from-purple-400 to-purple-300 bg-clip-text font-bold text-3xl text-transparent leading-tight">ByteBond</CardTitle>
+            <CardDescription className="text-slate-300">Sign in to start networking</CardDescription>
           </CardHeader>
 
-          <CardContent className="px-4 pb-6 sm:px-6 sm:pb-8">
+          <CardContent className="px-6 pb-8">
             <Form {...form}>
-              <form onSubmit={form.handleSubmit(handleLogin)} className="space-y-5">
+              <form onSubmit={form.handleSubmit(handleLogin)} className="space-y-6">
                 <FormField
                   control={form.control}
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="font-medium text-sm">Email Address</FormLabel>
+                      <FormLabel className="font-medium text-slate-200 text-sm">Email Address</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -66,10 +65,10 @@ export default function LoginPage() {
                           disabled={isLoading}
                           autoComplete="email"
                           inputMode="email"
-                          className="h-12 rounded-lg text-base transition-all duration-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-500"
+                          className="h-12 border-slate-600 bg-slate-800/50 text-white placeholder:text-slate-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
                         />
                       </FormControl>
-                      <FormMessage className="text-xs" />
+                      <FormMessage className="text-red-400 text-xs" />
                     </FormItem>
                   )}
                 />
@@ -79,7 +78,7 @@ export default function LoginPage() {
                   name="event_code"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="font-medium text-sm">Event Code</FormLabel>
+                      <FormLabel className="font-medium text-slate-200 text-sm">Event Code</FormLabel>
                       <FormControl>
                         <Input
                           {...field}
@@ -88,10 +87,10 @@ export default function LoginPage() {
                           disabled={isLoading}
                           autoComplete="off"
                           inputMode="text"
-                          className="h-12 rounded-lg text-center font-mono text-base tracking-wider transition-all duration-200 focus:border-purple-500 focus:ring-2 focus:ring-purple-500 sm:text-left"
+                          className="h-12 border-slate-600 bg-slate-800/50 text-center font-mono text-base text-white tracking-wider placeholder:text-slate-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 sm:text-left"
                         />
                       </FormControl>
-                      <FormMessage className="text-xs" />
+                      <FormMessage className="text-red-400 text-xs" />
                     </FormItem>
                   )}
                 />
@@ -99,7 +98,7 @@ export default function LoginPage() {
                 <Button
                   type="submit"
                   disabled={isLoading}
-                  className="h-12 w-full transform rounded-lg bg-gradient-to-r from-purple-600 to-pink-600 font-semibold text-base text-white shadow-lg transition-all duration-200 hover:from-purple-700 hover:to-pink-700 hover:shadow-xl active:scale-98 disabled:scale-100 sm:h-14 sm:text-lg"
+                  className="h-12 w-full bg-gradient-to-r from-purple-500 to-purple-700 font-semibold text-base text-white shadow-lg transition-all duration-200 hover:from-purple-600 hover:to-purple-800 hover:shadow-xl disabled:opacity-50"
                 >
                   {isLoading ? (
                     <div className="flex items-center gap-3">
@@ -113,11 +112,10 @@ export default function LoginPage() {
               </form>
             </Form>
 
-            {/* Link to signup */}
             <div className="mt-6 text-center">
-              <p className="text-gray-500 text-xs">
+              <p className="text-slate-400 text-sm">
                 Don't have an account?{" "}
-                <Link to="/onboarding" className="font-medium text-purple-600 underline-offset-2 hover:text-purple-800 hover:underline">
+                <Link to="/onboarding" className="font-medium text-purple-400 transition-colors hover:text-purple-300">
                   Sign Up
                 </Link>
               </p>
