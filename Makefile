@@ -16,7 +16,7 @@ stop-infra:
 start-dev:
 	@echo "Starting application... 🔄"
 	docker compose -f $(INFRA_COMPOSE_FILE) up -d
-	docker compose -f $(APP_COMPOSE_FILE) up --build
+	docker compose -f $(APP_COMPOSE_FILE) up --build -d
 	@echo "Application started. ✅"
 
 stop-dev:

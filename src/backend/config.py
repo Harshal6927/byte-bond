@@ -74,7 +74,7 @@ jwt_cookie_auth = JWTCookieAuth[User](
     default_token_expiration=timedelta(days=1),
     exclude=["/schema", "/saq"],
     samesite="strict",
-    secure=True,
+    secure=not settings.debug,
 )
 
 

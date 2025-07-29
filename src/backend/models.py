@@ -32,7 +32,10 @@ class Event(BigIntAuditBase):
     name: Mapped[str]
     code: Mapped[str] = mapped_column(unique=True, index=True)
     is_active: Mapped[bool] = mapped_column(default=False)
-    whitelist: Mapped[dict] = mapped_column(JsonB, default={})  # Whitelisted email should in a list with key "emails"
+    whitelist: Mapped[dict] = mapped_column(
+        JsonB,
+        default={"emails": []},
+    )
 
     # -----------------
     # ORM Relationships

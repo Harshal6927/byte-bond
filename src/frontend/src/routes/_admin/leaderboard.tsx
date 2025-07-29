@@ -187,9 +187,7 @@ function LeaderboardPage() {
                     {events.map((event) => (
                       <SelectItem key={event.id} value={event.id.toString()}>
                         <div className="flex items-center gap-2">
-                          <span>
-                            {event.name} ({event.code})
-                          </span>
+                          {event.name}
                           <span className={`h-2 w-2 rounded-full ${event.is_active ? "bg-green-500" : "bg-red-500"}`} />
                         </div>
                       </SelectItem>
