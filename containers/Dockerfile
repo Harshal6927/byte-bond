@@ -27,14 +27,17 @@ FROM python-base as builder
 # Install python dependencies
 WORKDIR /workspace/app
 COPY pyproject.toml uv.lock README.md ./
-RUN uv sync --no-dev
+RUN uv sync --no-dev --frozen --no-install-project --no-editable
 
 # Build frontend
-COPY src src/
+COPY src ./src
 RUN uvx nodeenv --quiet /opt/nodeenv/
 ENV PATH="/opt/nodeenv/bin:$PATH"
 RUN cd src/frontend && npm ci --ignore-scripts --no-fund
 RUN cd src/frontend && npm run build
+
+# # Build python package
+# RUN uv build
 
 ## ---------------------------------------------------------------------------------- ##
 ## -------------------------------- Run Image --------------------------------------- ##
@@ -42,11 +45,9 @@ RUN cd src/frontend && npm run build
 
 FROM python-base AS runner
 ENV PATH="/workspace/app/.venv/bin:/usr/local/bin:$PATH" \
-    LITESTAR_APP="app.main:app" \
     UV_LINK_MODE=copy \
     UV_NO_CACHE=1 \
     UV_COMPILE_BYTECODE=1 \
-    UV_INSTALL_ARGS="--no-dev" \
     UV_SYSTEM_PYTHON=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
@@ -56,20 +57,19 @@ ENV PATH="/workspace/app/.venv/bin:/usr/local/bin:$PATH" \
     LC_ALL=C.UTF-8
 
 WORKDIR /workspace/app
-COPY src/backend src/backend/
 COPY --from=builder /workspace/app/.venv ./.venv
-COPY --from=builder /workspace/app/src/backend/web src/backend/web
-COPY migrations ./migrations/
-COPY containers/entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+COPY --from=builder /workspace/app/src/backend ./src/backend
+COPY migrations ./migrations
+COPY containers/entrypoint.sh ./entrypoint.sh
+RUN chmod +x ./entrypoint.sh
 
 RUN addgroup --system --gid 65532 nonroot \
     && adduser --no-create-home --system --uid 65532 nonroot \
     && chown -R nonroot:nonroot /workspace \
-    && chown nonroot:nonroot /entrypoint.sh
+    && chown nonroot:nonroot ./entrypoint.sh
 USER nonroot
 STOPSIGNAL SIGINT
 EXPOSE 8000
 
-ENTRYPOINT ["/entrypoint.sh"]
+ENTRYPOINT ["./entrypoint.sh"]
 CMD ["tini", "--", "litestar", "run", "--host", "0.0.0.0", "--port", "8000"]

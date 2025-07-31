@@ -38,4 +38,4 @@ dist-ssr
 test_storage/
 test.sqlite
 .tanstack
-web/
+src/backend/web/static/

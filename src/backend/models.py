@@ -162,7 +162,7 @@ class Connection(BigIntAuditBase):
     )
     end_time: Mapped[datetime.datetime] = mapped_column(
         DateTimeUTC(timezone=True),
-        default=lambda: datetime.datetime.now(datetime.UTC) + datetime.timedelta(hours=1),
+        default=lambda: datetime.datetime.now(datetime.UTC) + datetime.timedelta(hours=4),
     )
     status: Mapped[ConnectionStatus] = mapped_column(default=ConnectionStatus.PENDING)
     event_id: Mapped[int] = mapped_column(ForeignKey("events.id", ondelete="CASCADE"))

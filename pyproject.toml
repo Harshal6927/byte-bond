@@ -23,6 +23,12 @@ requires = ["hatchling"]
 [tool.hatch.build.targets.wheel]
 packages = ["src/backend"]
 
+[tool.hatch.build.targets.wheel.sources]
+"src/backend" = "src/backend"
+
+[project.scripts]
+app = "src.backend.__main__:run_cli"
+
 [tool.ruff]
 line-length = 120
 lint.ignore = [
