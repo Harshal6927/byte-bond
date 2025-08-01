@@ -33,7 +33,7 @@ dist-ssr
 
 .venv
 .env
-.env.dev
+.env.prod
 .vscode
 test_storage/
 test.sqlite
