@@ -11,7 +11,6 @@ from src.backend.config import (
     alchemy_plugin,
     channels_plugin,
     jwt_cookie_auth,
-    rate_limit,
     saq_plugin,
     settings,
     vite_plugin,
@@ -63,5 +62,4 @@ app = Litestar(
         Exception: exception_handler,
         RepositoryError: exception_handler,
     },
-    middleware=[rate_limit.middleware],
 )

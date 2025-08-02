@@ -4,7 +4,6 @@ from typing import Any
 from litestar.channels import ChannelsPlugin
 from litestar.channels.backends.memory import MemoryChannelsBackend
 from litestar.connection import ASGIConnection
-from litestar.middleware.rate_limit import RateLimitConfig
 from litestar.plugins.sqlalchemy import (
     AsyncSessionConfig,
     SQLAlchemyAsyncConfig,
@@ -118,9 +117,6 @@ saq_plugin = SAQPlugin(
         ],
     ),
 )
-
-# Rate Limiting
-rate_limit = RateLimitConfig(rate_limit=("minute", 100), exclude_opt_key="no_app_rate_limit")
 
 
 # Admin
