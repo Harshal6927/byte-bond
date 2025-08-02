@@ -1,10 +1,10 @@
 import random
 from typing import TYPE_CHECKING
 
-from litestar import Request, get, post, status_codes
+from litestar import Request, get, post
 from litestar.controller import Controller
 from litestar.di import Provide
-from litestar.exceptions import HTTPException, NotAuthorizedException
+from litestar.exceptions import ClientException, NotAuthorizedException, NotFoundException, PermissionDeniedException
 from litestar.middleware.rate_limit import RateLimitConfig
 
 from src.backend.lib.dependencies import (
@@ -272,8 +272,7 @@ class GameController(Controller):
             connection_service=connection_service,
         )
         if not current_connection or current_connection.status != ConnectionStatus.ACTIVE:
-            raise HTTPException(
-                status_code=status_codes.HTTP_400_BAD_REQUEST,
+            raise NotFoundException(
                 detail="No active connection found",
             )
 
@@ -284,15 +283,13 @@ class GameController(Controller):
             user_id=user.id,
         )
         if not conn_question:
-            raise HTTPException(
-                status_code=status_codes.HTTP_400_BAD_REQUEST,
+            raise PermissionDeniedException(
                 detail="You are not assigned to answer this question",
             )
 
         # Check if question was already answered
         if conn_question.question_answered:
-            raise HTTPException(
-                status_code=status_codes.HTTP_400_BAD_REQUEST,
+            raise ClientException(
                 detail="Question already answered",
             )
 
@@ -309,8 +306,7 @@ class GameController(Controller):
                 break
 
         if not other_user_answer:
-            raise HTTPException(
-                status_code=status_codes.HTTP_404_NOT_FOUND,
+            raise ClientException(
                 detail="Other user hasn't answered this question during signup",
             )
 
@@ -359,8 +355,7 @@ class GameController(Controller):
         )
 
         if not current_connection or current_connection.status != ConnectionStatus.ACTIVE:
-            raise HTTPException(
-                status_code=status_codes.HTTP_404_NOT_FOUND,
+            raise NotFoundException(
                 detail="No active connection found",
             )
 
@@ -372,8 +367,7 @@ class GameController(Controller):
         unanswered_questions = [cq for cq in all_connection_questions if not cq.question_answered]
 
         if unanswered_questions:
-            raise HTTPException(
-                status_code=status_codes.HTTP_400_BAD_REQUEST,
+            raise ClientException(
                 detail=f"{len(unanswered_questions)} questions still unanswered",
             )
 
@@ -408,6 +402,60 @@ class GameController(Controller):
             request=request,
         )
 
+    @post("/cancel-connection")
+    async def cancel_connection(
+        self,
+        request: Request,
+        connection_service: ConnectionService,
+        user_service: UserService,
+    ) -> None:
+        user: User = request.user
+
+        # Get user's current active connection
+        current_connection = await self._get_user_active_connection(
+            user_id=user.id,
+            event_id=user.event_id,
+            connection_service=connection_service,
+        )
+
+        if not current_connection:
+            raise NotFoundException(
+                detail="No active connection found",
+            )
+
+        # Can only cancel pending or active connections
+        if current_connection.status not in {ConnectionStatus.PENDING, ConnectionStatus.ACTIVE}:
+            raise ClientException(
+                detail="Connection cannot be cancelled in its current state",
+            )
+
+        # Cancel the connection
+        await connection_service.update(
+            item_id=current_connection.id,
+            data={"status": ConnectionStatus.CANCELLED},
+        )
+
+        # Set both users back to available status
+        await user_service.update_many(
+            data=[
+                {
+                    "id": current_connection.user1_id,
+                    "status": UserStatus.AVAILABLE,
+                },
+                {
+                    "id": current_connection.user2_id,
+                    "status": UserStatus.AVAILABLE,
+                },
+            ],
+        )
+
+        # Refresh game status for both users
+        self._refresh_user_game_status(
+            user1=current_connection.user1_id,
+            user2=current_connection.user2_id,
+            request=request,
+        )
+
     @post("/chat")
     async def chat(
         self,
@@ -425,8 +473,7 @@ class GameController(Controller):
         )
 
         if not current_connection:
-            raise HTTPException(
-                status_code=status_codes.HTTP_404_NOT_FOUND,
+            raise NotFoundException(
                 detail="No connection found",
             )
 

@@ -1,5 +1,6 @@
 from advanced_alchemy.exceptions import DuplicateKeyError, NotFoundError, RepositoryError
 from litestar import Litestar
+from litestar.exceptions import ClientException, NotAuthorizedException, NotFoundException
 from litestar.logging import LoggingConfig
 from litestar.openapi import OpenAPIConfig
 from litestar.openapi.plugins import ScalarRenderPlugin
@@ -44,7 +45,19 @@ app = Litestar(
         render_plugins=[ScalarRenderPlugin()],
     ),
     logging_config=LoggingConfig(
-        disable_stack_trace={400, 401, 403, 404, 405, 429, NotFoundError, DuplicateKeyError},
+        disable_stack_trace={
+            400,
+            401,
+            403,
+            404,
+            405,
+            429,
+            NotFoundError,
+            DuplicateKeyError,
+            ClientException,
+            NotAuthorizedException,
+            NotFoundException,
+        },
     ),
     exception_handlers={
         Exception: exception_handler,

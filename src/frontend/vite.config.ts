@@ -7,6 +7,7 @@ import { defineConfig } from "vite"
 const APP_URL = process.env.APP_URL || "http://0.0.0.0:8000"
 const API_URL = APP_URL
 const VITE_PORT = process.env.VITE_PORT || 8080
+const ASSET_URL = process.env.ASSET_URL || "/static/"
 
 // TODO: Make outDir and base point to CDN
 
@@ -21,7 +22,7 @@ async function getConfig() {
       tailwindcss(),
       react(),
     ],
-    base: "/static/",
+    base: ASSET_URL,
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "./src"),

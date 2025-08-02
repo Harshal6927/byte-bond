@@ -1,4 +1,4 @@
-import { type GameStatus, type GetUser, apiGameChatChat, apiGameScanQrScanQrCode } from "@/client"
+import { type GameStatus, type GetUser, apiGameCancelConnectionCancelConnection, apiGameChatChat, apiGameScanQrScanQrCode } from "@/client"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer"
@@ -384,6 +384,33 @@ export function Connecting({ gameStatus, user }: ConnectingProps) {
               <p className="text-slate-400 text-sm">Get points for correct answers</p>
             </div>
           </div>
+        </div>
+      </Card>
+
+      {/* Cancel Connection Button */}
+      <Card className="border-red-500/20 bg-gradient-to-br from-red-500/10 to-red-700/10 p-6 backdrop-blur-sm">
+        <div className="text-center">
+          <h3 className="font-semibold text-lg text-red-400">Can't Find Your Partner?</h3>
+          <p className="mb-6 text-red-200/80 text-sm">If you're unable to locate each other, you can cancel this connection and try again with another partner.</p>
+          <Button
+            onClick={async () => {
+              const response = await apiGameCancelConnectionCancelConnection()
+              if (response.status === 201) {
+                toast.success("Connection cancelled. You're now available for new connections.")
+              } else {
+                toast.error("Failed to cancel connection", {
+                  description:
+                    typeof response.error === "object" && response.error !== null && "detail" in response.error
+                      ? (response.error as { detail?: string }).detail
+                      : "Please try again",
+                })
+              }
+            }}
+            className="w-full bg-gradient-to-r from-red-500 to-red-600 py-3 font-semibold text-base text-white transition-all duration-200 hover:from-red-600 hover:to-red-700"
+          >
+            <X className="h-5 w-5" />
+            Cancel Connection
+          </Button>
         </div>
       </Card>
 

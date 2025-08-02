@@ -22,10 +22,12 @@ class ViteSettings:
     hot_reload: bool = field(
         default_factory=lambda: os.getenv("VITE_HOT_RELOAD", "false").lower() in {"true", "1", "yes"},
     )
+    asset_url: str = field(
+        default_factory=lambda: os.getenv("ASSET_URL", "/static/"),
+    )
     root_dir: Path = Path(__file__).parent.parent / "frontend"
     resource_dir: Path = Path(__file__).parent.parent / "frontend" / "src"
     bundle_dir: Path = Path(__file__).parent / "web" / "static"
-    asset_url: Path = "/static/"
 
 
 @dataclass

@@ -473,6 +473,20 @@ export type ApiGameAnswerQuestionAnswerQuestionResponses = {
 
 export type ApiGameAnswerQuestionAnswerQuestionResponse = ApiGameAnswerQuestionAnswerQuestionResponses[keyof ApiGameAnswerQuestionAnswerQuestionResponses];
 
+export type ApiGameCancelConnectionCancelConnectionData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/game/cancel-connection';
+};
+
+export type ApiGameCancelConnectionCancelConnectionResponses = {
+    /**
+     * Document created, URL follows
+     */
+    201: unknown;
+};
+
 export type ApiGameChatChatData = {
     body: GameChatRequest;
     path?: never;

@@ -532,6 +532,22 @@
                 "deprecated": false
             }
         },
+        "/api/game/cancel-connection": {
+            "post": {
+                "tags": [
+                    "Game"
+                ],
+                "summary": "CancelConnection",
+                "operationId": "ApiGameCancelConnectionCancelConnection",
+                "responses": {
+                    "201": {
+                        "description": "Document created, URL follows",
+                        "headers": {}
+                    }
+                },
+                "deprecated": false
+            }
+        },
         "/api/game/chat": {
             "post": {
                 "tags": [
