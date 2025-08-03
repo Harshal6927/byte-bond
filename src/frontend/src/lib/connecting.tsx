@@ -1,6 +1,7 @@
 import { type GameStatus, type GetUser, apiGameCancelConnectionCancelConnection, apiGameChatChat, apiGameScanQrScanQrCode } from "@/client"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer"
 import { Input } from "@/components/ui/input"
 import { Camera, MessageCircle, QrCodeIcon, Scan, Send, Users, X } from "lucide-react"
@@ -24,6 +25,7 @@ export function Connecting({ gameStatus, user }: ConnectingProps) {
   const isQrGiver = gameStatus.qr_code !== null
   const [isScanning, setIsScanning] = useState(false)
   const [hasPermission, setHasPermission] = useState<boolean | null>(null)
+  const [showCancelDialog, setShowCancelDialog] = useState(false)
   const videoRef = useRef<HTMLVideoElement>(null)
   const qrScannerRef = useRef<QrScanner | null>(null)
 
@@ -242,6 +244,19 @@ export function Connecting({ gameStatus, user }: ConnectingProps) {
     }
   }
 
+  const handleCancelConnection = async () => {
+    const response = await apiGameCancelConnectionCancelConnection()
+    if (response.status === 201) {
+      toast.success("Connection cancelled. You're now available for new connections.")
+    } else {
+      toast.error("Failed to cancel connection", {
+        description:
+          typeof response.error === "object" && response.error !== null && "detail" in response.error ? (response.error as { detail?: string }).detail : "Please try again",
+      })
+    }
+    setShowCancelDialog(false)
+  }
+
   return (
     <div className="space-y-6 p-4">
       {/* Status Header */}
@@ -393,19 +408,7 @@ export function Connecting({ gameStatus, user }: ConnectingProps) {
           <h3 className="font-semibold text-lg text-red-400">Can't Find Your Partner?</h3>
           <p className="mb-6 text-red-200/80 text-sm">If you're unable to locate each other, you can cancel this connection and try again with another partner.</p>
           <Button
-            onClick={async () => {
-              const response = await apiGameCancelConnectionCancelConnection()
-              if (response.status === 201) {
-                toast.success("Connection cancelled. You're now available for new connections.")
-              } else {
-                toast.error("Failed to cancel connection", {
-                  description:
-                    typeof response.error === "object" && response.error !== null && "detail" in response.error
-                      ? (response.error as { detail?: string }).detail
-                      : "Please try again",
-                })
-              }
-            }}
+            onClick={() => setShowCancelDialog(true)}
             className="w-full bg-gradient-to-r from-red-500 to-red-600 py-3 font-semibold text-base text-white transition-all duration-200 hover:from-red-600 hover:to-red-700"
           >
             <X className="h-5 w-5" />
@@ -499,6 +502,24 @@ export function Connecting({ gameStatus, user }: ConnectingProps) {
           </DrawerContent>
         </Drawer>
       )}
+
+      {/* Cancel Connection Confirmation Dialog */}
+      <Dialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Cancel Connection?</DialogTitle>
+            <DialogDescription>Are you sure you want to cancel this connection? You will lose your current partner and need to find a new one.</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowCancelDialog(false)} className="border-slate-600 text-slate-300 hover:bg-slate-700">
+              Keep Connection
+            </Button>
+            <Button onClick={handleCancelConnection} className="bg-gradient-to-r from-red-500 to-red-600 font-semibold text-white hover:from-red-600 hover:to-red-700">
+              Yes, Cancel
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

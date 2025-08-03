@@ -1,5 +1,6 @@
 import { type GameStatus, apiGameStatusGetGameStatus } from "@/client"
 import { Button } from "@/components/ui/button"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { useUser } from "@/components/user-context"
 import { Available } from "@/lib/available"
 import { Busy } from "@/lib/busy"
@@ -18,6 +19,7 @@ function DashboardPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [isConnectedToWS, setIsConnectedToWS] = useState(false)
+  const [showCancellationDialog, setShowCancellationDialog] = useState(false)
   const { user, getUser } = useUser()
   const socketRef = useRef<WebSocket | null>(null)
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
@@ -72,6 +74,10 @@ function DashboardPage() {
       if (data.message === `refresh-${user.id}`) {
         getUser()
         fetchGameStatus()
+      }
+
+      if (data.message === `cancelled-${user.id}`) {
+        setShowCancellationDialog(true)
       }
     })
 
@@ -203,6 +209,24 @@ function DashboardPage() {
           {gameStatus.user_status === "connecting" && <Connecting gameStatus={gameStatus} user={user} />}
           {gameStatus.user_status === "busy" && <Busy gameStatus={gameStatus} />}
         </div>
+
+        {/* Cancellation Dialog */}
+        <Dialog open={showCancellationDialog} onOpenChange={setShowCancellationDialog}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Game Cancelled</DialogTitle>
+              <DialogDescription>Your partner has cancelled the game.</DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button
+                onClick={() => setShowCancellationDialog(false)}
+                className="bg-gradient-to-r from-purple-500 to-purple-700 font-semibold text-white hover:from-purple-600 hover:to-purple-800"
+              >
+                Understood
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     )
   }

@@ -1,5 +1,4 @@
 import random
-from typing import TYPE_CHECKING
 
 from litestar import Request, get, post
 from litestar.controller import Controller
@@ -20,7 +19,7 @@ from src.backend.lib.services import (
     QuestionService,
     UserService,
 )
-from src.backend.lib.utils import admin_user_guard
+from src.backend.lib.utils import admin_user_guard, publish_to_channel
 from src.backend.models import Connection, ConnectionQuestion, ConnectionStatus, Question, User, UserStatus
 from src.backend.schema.event import GetEvent
 from src.backend.schema.game import (
@@ -35,9 +34,6 @@ from src.backend.schema.game import (
     QRScanRequest,
     QuestionResult,
 )
-
-if TYPE_CHECKING:
-    from litestar.channels.plugin import ChannelsPlugin
 
 GAME_QUESTIONS_COUNT = 6
 
@@ -245,10 +241,19 @@ class GameController(Controller):
             connection_question_service=connection_question_service,
         )
 
-        self._refresh_user_game_status(
-            user1=current_connection.user1_id,
-            user2=current_connection.user2_id,
+        publish_to_channel(
             request=request,
+            data={
+                "message": f"refresh-{current_connection.user1_id}",
+            },
+            channel="game-status",
+        )
+        publish_to_channel(
+            request=request,
+            data={
+                "message": f"refresh-{current_connection.user2_id}",
+            },
+            channel="game-status",
         )
 
     # Rate limit: 1 request per minute per user
@@ -394,10 +399,19 @@ class GameController(Controller):
             ],
         )
 
-        self._refresh_user_game_status(
-            user1=current_connection.user1_id,
-            user2=current_connection.user2_id,
+        publish_to_channel(
             request=request,
+            data={
+                "message": f"refresh-{current_connection.user1_id}",
+            },
+            channel="game-status",
+        )
+        publish_to_channel(
+            request=request,
+            data={
+                "message": f"refresh-{current_connection.user2_id}",
+            },
+            channel="game-status",
         )
 
     @post("/cancel-connection")
@@ -447,11 +461,32 @@ class GameController(Controller):
             ],
         )
 
-        # Refresh game status for both users
-        self._refresh_user_game_status(
-            user1=current_connection.user1_id,
-            user2=current_connection.user2_id,
+        # Send notification popup to other user
+        other_user_id = (
+            current_connection.user2_id if current_connection.user1_id == user.id else current_connection.user1_id
+        )
+        publish_to_channel(
             request=request,
+            data={
+                "message": f"cancelled-{other_user_id}",
+            },
+            channel="game-status",
+        )
+
+        # Refresh game status for both users
+        publish_to_channel(
+            request=request,
+            data={
+                "message": f"refresh-{current_connection.user1_id}",
+            },
+            channel="game-status",
+        )
+        publish_to_channel(
+            request=request,
+            data={
+                "message": f"refresh-{current_connection.user2_id}",
+            },
+            channel="game-status",
         )
 
     @post("/chat")
@@ -478,14 +513,13 @@ class GameController(Controller):
         other_user_id = (
             current_connection.user2_id if current_connection.user1_id == user.id else current_connection.user1_id
         )
-        channels: ChannelsPlugin = request.app.plugins.get(
-            "litestar.channels.plugin.ChannelsPlugin",
-        )
-        channels.publish(
+
+        publish_to_channel(
+            request=request,
             data={
                 "message": data.message,
             },
-            channels=str(other_user_id),
+            channel=str(other_user_id),
         )
 
     async def _get_user_connection_questions(
@@ -591,24 +625,3 @@ class GameController(Controller):
             user2_id=user_id,
             event_id=event_id,
         )
-
-    def _refresh_user_game_status(self, *, user1: int | None, user2: int | None, request: Request) -> None:
-        channels: ChannelsPlugin = request.app.plugins.get(
-            "litestar.channels.plugin.ChannelsPlugin",
-        )
-
-        if user1:
-            channels.publish(
-                data={
-                    "message": f"refresh-{user1}",
-                },
-                channels="game-status",
-            )
-
-        if user2:
-            channels.publish(
-                data={
-                    "message": f"refresh-{user2}",
-                },
-                channels="game-status",
-            )

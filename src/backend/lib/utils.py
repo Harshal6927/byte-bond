@@ -1,3 +1,5 @@
+from typing import TYPE_CHECKING
+
 from advanced_alchemy.exceptions import IntegrityError, NotFoundError, RepositoryError
 from advanced_alchemy.extensions.litestar.exception_handler import (
     ConflictError,
@@ -15,6 +17,10 @@ from litestar.status_codes import (
     HTTP_409_CONFLICT,
     HTTP_500_INTERNAL_SERVER_ERROR,
 )
+from litestar.types import LitestarEncodableType
+
+if TYPE_CHECKING:
+    from litestar.channels.plugin import ChannelsPlugin
 
 
 class _HTTPConflictException(HTTPException):
@@ -48,3 +54,14 @@ def exception_handler(
 def admin_user_guard(connection: ASGIConnection, _: BaseRouteHandler) -> None:
     if not connection.user.is_admin:
         raise NotAuthorizedException
+
+
+def publish_to_channel(request: Request, data: LitestarEncodableType, channel: str) -> None:
+    channels: ChannelsPlugin = request.app.plugins.get(
+        "litestar.channels.plugin.ChannelsPlugin",
+    )
+
+    channels.publish(
+        data=data,
+        channels=channel,
+    )

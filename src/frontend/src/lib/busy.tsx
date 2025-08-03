@@ -8,6 +8,7 @@ import {
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { CheckCircle, Clock, MessageCircle, Timer, Trophy, Users, X, XCircle } from "lucide-react"
 import { useEffect, useState } from "react"
@@ -20,6 +21,7 @@ interface BusyProps {
 export function Busy({ gameStatus: initialGameStatus }: BusyProps) {
   // Local state for game status that gets updated
   const [gameStatus, setGameStatus] = useState<GameStatus>(initialGameStatus)
+  const [showCancelDialog, setShowCancelDialog] = useState(false)
   const totalQuestions = gameStatus.connection_questions?.length || 0
   const answeredQuestions = gameStatus.connection_questions?.filter((q) => q.question_answered).length || 0
   const correctAnswers = gameStatus.connection_questions?.filter((q) => q.answered_correctly).length || 0
@@ -135,6 +137,19 @@ export function Busy({ gameStatus: initialGameStatus }: BusyProps) {
       e.preventDefault()
       handleSubmitAnswer(questionId)
     }
+  }
+
+  const handleCancelConnection = async () => {
+    const response = await apiGameCancelConnectionCancelConnection()
+    if (response.status === 201) {
+      toast.success("Connection cancelled. You're now available for new connections.")
+    } else {
+      toast.error("Failed to cancel connection", {
+        description:
+          typeof response.error === "object" && response.error !== null && "detail" in response.error ? (response.error as { detail?: string }).detail : "Please try again",
+      })
+    }
+    setShowCancelDialog(false)
   }
 
   const isCooldownActive = cooldownEnd && Date.now() < cooldownEnd
@@ -334,19 +349,7 @@ export function Busy({ gameStatus: initialGameStatus }: BusyProps) {
           <h3 className="font-semibold text-lg text-red-400">Need to Leave?</h3>
           <p className="mb-6 text-red-200/80 text-sm">If you need to stop playing with your current partner, you can cancel this connection.</p>
           <Button
-            onClick={async () => {
-              const response = await apiGameCancelConnectionCancelConnection()
-              if (response.status === 201) {
-                toast.success("Connection cancelled. You're now available for new connections.")
-              } else {
-                toast.error("Failed to cancel connection", {
-                  description:
-                    typeof response.error === "object" && response.error !== null && "detail" in response.error
-                      ? (response.error as { detail?: string }).detail
-                      : "Please try again",
-                })
-              }
-            }}
+            onClick={() => setShowCancelDialog(true)}
             className="w-full bg-gradient-to-r from-red-500 to-red-600 py-3 font-semibold text-base text-white transition-all duration-200 hover:from-red-600 hover:to-red-700"
           >
             <X className="h-5 w-5" />
@@ -354,6 +357,24 @@ export function Busy({ gameStatus: initialGameStatus }: BusyProps) {
           </Button>
         </div>
       </Card>
+
+      {/* Cancel Connection Confirmation Dialog */}
+      <Dialog open={showCancelDialog} onOpenChange={setShowCancelDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Cancel Connection?</DialogTitle>
+            <DialogDescription>Are you sure you want to cancel this connection? You will lose your current progress and need to find a new partner.</DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowCancelDialog(false)} className="border-slate-600 text-slate-300 hover:bg-slate-700">
+              Keep Playing
+            </Button>
+            <Button onClick={handleCancelConnection} className="bg-gradient-to-r from-red-500 to-red-600 font-semibold text-white hover:from-red-600 hover:to-red-700">
+              Yes, Cancel
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
