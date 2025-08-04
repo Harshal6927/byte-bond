@@ -22,6 +22,7 @@ from src.backend.controllers.game import GameController
 from src.backend.controllers.question import QuestionController
 from src.backend.controllers.user import UserController
 from src.backend.controllers.user_answer import UserAnswerController
+from src.backend.lib.otel import configure_instrumentation
 from src.backend.lib.utils import exception_handler
 
 app = Litestar(
@@ -35,7 +36,14 @@ app = Litestar(
         UserAnswerController,
         WebController,
     ],
-    plugins=[admin_plugin, alchemy_plugin, channels_plugin, saq_plugin, vite_plugin, CLIPlugin()],
+    plugins=[
+        admin_plugin,
+        alchemy_plugin,
+        channels_plugin,
+        saq_plugin,
+        vite_plugin,
+        CLIPlugin(),
+    ],
     on_app_init=[jwt_cookie_auth.on_app_init],
     openapi_config=OpenAPIConfig(
         title="Byte Bond",
@@ -62,4 +70,5 @@ app = Litestar(
         Exception: exception_handler,
         RepositoryError: exception_handler,
     },
+    middleware=[configure_instrumentation().middleware],
 )
