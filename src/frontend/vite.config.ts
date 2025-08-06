@@ -9,8 +9,6 @@ const API_URL = APP_URL
 const VITE_PORT = process.env.VITE_PORT || 8080
 const ASSET_URL = process.env.ASSET_URL || "/static/"
 
-// TODO: Make outDir and base point to CDN
-
 // https://vite.dev/config/
 async function getConfig() {
   return defineConfig({

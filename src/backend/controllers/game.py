@@ -1,5 +1,6 @@
 import random
 
+from advanced_alchemy.filters import LimitOffset
 from litestar import Request, get, post
 from litestar.controller import Controller
 from litestar.di import Provide
@@ -101,17 +102,15 @@ class GameController(Controller):
     ) -> Leaderboard:
         event = await event_service.get(event_id)
 
-        # TODO: Top 20 users only
         users = await user_service.list(
-            event_id=event_id,
-            is_admin=False,
+            LimitOffset(limit=20, offset=0),
             order_by=[
                 User.points.desc(),
                 User.connection_count.desc(),
                 User.name.asc(),
             ],
-            # limit=20,
-            # AttributeError: type object 'User' has no attribute 'limit'
+            event_id=event_id,
+            is_admin=False,
         )
 
         # Create leaderboard entries with rank

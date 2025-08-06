@@ -1,13 +1,99 @@
+import { type GetEvent, apiEventsGetEvents, apiGameStartStartGame, apiGameStopStopGame } from "@/client"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { createFileRoute } from "@tanstack/react-router"
 import { Activity, Gamepad2, Plus, Settings, Trophy, Users } from "lucide-react"
+import { useEffect, useState } from "react"
 
 export const Route = createFileRoute("/_admin/manage")({
   component: ManagePage,
 })
 
 function ManagePage() {
+  const [events, setEvents] = useState<GetEvent[]>([])
+  const [selectedEventId, setSelectedEventId] = useState<string>("")
+  const [eventsLoading, setEventsLoading] = useState(true)
+  const [gameLoading, setGameLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      setEventsLoading(true)
+      setError(null)
+
+      try {
+        const response = await apiEventsGetEvents()
+        if (response.status === 200 && response.data) {
+          setEvents(response.data.items || [])
+        } else {
+          setError("Failed to fetch events")
+        }
+      } catch (err) {
+        setError("Failed to fetch events")
+      }
+
+      setEventsLoading(false)
+    }
+
+    fetchEvents()
+  }, [])
+
+  const handleStartGame = async () => {
+    if (!selectedEventId) return
+
+    setGameLoading(true)
+    setError(null)
+
+    try {
+      const response = await apiGameStartStartGame({
+        body: { event_id: Number.parseInt(selectedEventId) },
+      })
+
+      if (response.status === 201) {
+        // Refresh events to get updated status
+        const eventsResponse = await apiEventsGetEvents()
+        if (eventsResponse.status === 200 && eventsResponse.data) {
+          setEvents(eventsResponse.data.items || [])
+        }
+      } else {
+        setError("Failed to start game")
+      }
+    } catch (err) {
+      setError("Failed to start game")
+    }
+
+    setGameLoading(false)
+  }
+
+  const handleStopGame = async () => {
+    if (!selectedEventId) return
+
+    setGameLoading(true)
+    setError(null)
+
+    try {
+      const response = await apiGameStopStopGame({
+        body: { event_id: Number.parseInt(selectedEventId) },
+      })
+
+      if (response.status === 201) {
+        // Refresh events to get updated status
+        const eventsResponse = await apiEventsGetEvents()
+        if (eventsResponse.status === 200 && eventsResponse.data) {
+          setEvents(eventsResponse.data.items || [])
+        }
+      } else {
+        setError("Failed to stop game")
+      }
+    } catch (err) {
+      setError("Failed to stop game")
+    }
+
+    setGameLoading(false)
+  }
+
+  const selectedEvent = events.find((event) => event.id.toString() === selectedEventId)
   return (
     <div className="space-y-8 p-8">
       <div>
@@ -124,20 +210,81 @@ function ManagePage() {
             <CardDescription>Control active games and matches</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <Button className="w-full justify-start" variant="outline">
-              <Activity className="h-4 w-4" />
-              View Active Games
-            </Button>
-            <Button className="w-full justify-start" variant="outline">
-              <Settings className="h-4 w-4" />
-              Game Settings
-            </Button>
+            {/* Error Display */}
+            {error && (
+              <div className="rounded-md border border-destructive/50 bg-destructive/10 p-3">
+                <p className="text-destructive text-sm">{error}</p>
+              </div>
+            )}
+
+            {/* Event Selection */}
+            <div className="space-y-2">
+              <label htmlFor="event-select" className="font-medium text-sm">
+                Select Event
+              </label>
+              <Select value={selectedEventId} onValueChange={setSelectedEventId} disabled={eventsLoading}>
+                <SelectTrigger id="event-select" className="w-full">
+                  <SelectValue placeholder={eventsLoading ? "Loading events..." : "Select an event"} />
+                </SelectTrigger>
+                <SelectContent>
+                  {events.map((event) => (
+                    <SelectItem key={event.id} value={event.id.toString()}>
+                      <div className="flex items-center gap-2">
+                        {event.name}
+                        <span className={`h-2 w-2 rounded-full ${event.is_active ? "bg-green-500" : "bg-red-500"}`} />
+                      </div>
+                    </SelectItem>
+                  ))}
+                  {events.length === 0 && !eventsLoading && (
+                    <SelectItem value="" disabled>
+                      No events found
+                    </SelectItem>
+                  )}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Event Status */}
+            {selectedEvent && (
+              <div className="space-y-2 rounded-md border p-3">
+                <div className="flex items-center justify-between">
+                  <span className="font-medium text-sm">Event Status</span>
+                  <span
+                    className={`inline-flex items-center gap-1 rounded-full px-2 py-1 font-medium text-xs ${
+                      selectedEvent.is_active ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200" : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200"
+                    }`}
+                  >
+                    <span className={`h-1.5 w-1.5 rounded-full ${selectedEvent.is_active ? "bg-green-500" : "bg-red-500"}`} />
+                    {selectedEvent.is_active ? "Active" : "Inactive"}
+                  </span>
+                </div>
+                <p className="text-muted-foreground text-sm">
+                  Event Code: <span className="font-medium font-mono">{selectedEvent.code}</span>
+                </p>
+              </div>
+            )}
+
+            {/* Action Buttons */}
             <div className="flex gap-2">
-              <Button className="flex-1" variant="outline" size="sm">
-                Start Game
+              <Button className="flex-1" variant="outline" size="sm" onClick={handleStartGame} disabled={!selectedEventId || gameLoading || selectedEvent?.is_active}>
+                {gameLoading ? (
+                  <div className="flex items-center gap-2">
+                    <div className="h-3 w-3 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                    Starting...
+                  </div>
+                ) : (
+                  "Start Game"
+                )}
               </Button>
-              <Button className="flex-1" variant="outline" size="sm">
-                Stop Game
+              <Button className="flex-1" variant="outline" size="sm" onClick={handleStopGame} disabled={!selectedEventId || gameLoading || !selectedEvent?.is_active}>
+                {gameLoading ? (
+                  <div className="flex items-center gap-2">
+                    <div className="h-3 w-3 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                    Stopping...
+                  </div>
+                ) : (
+                  "Stop Game"
+                )}
               </Button>
             </div>
           </CardContent>
