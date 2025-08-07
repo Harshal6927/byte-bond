@@ -11,6 +11,7 @@ from src.backend.lib.dependencies import (
     provide_connection_service,
     provide_event_service,
     provide_question_service,
+    provide_user_answer_service,
     provide_user_service,
 )
 from src.backend.lib.services import (
@@ -18,6 +19,7 @@ from src.backend.lib.services import (
     ConnectionService,
     EventService,
     QuestionService,
+    UserAnswerService,
     UserService,
 )
 from src.backend.lib.utils import admin_user_guard, publish_to_channel
@@ -48,6 +50,7 @@ class GameController(Controller):
         "user_service": Provide(provide_user_service),
         "question_service": Provide(provide_question_service),
         "connection_question_service": Provide(provide_connection_question_service),
+        "user_answer_service": Provide(provide_user_answer_service),
     }
 
     # Admin
@@ -198,6 +201,7 @@ class GameController(Controller):
         connection_service: ConnectionService,
         question_service: QuestionService,
         connection_question_service: ConnectionQuestionService,
+        user_answer_service: UserAnswerService,
     ) -> None:
         user: User = request.user
 
@@ -236,8 +240,8 @@ class GameController(Controller):
             user1_id=current_connection.user1_id,
             user2_id=current_connection.user2_id,
             connection_id=current_connection.id,
-            question_service=question_service,
             connection_question_service=connection_question_service,
+            user_answer_service=user_answer_service,
         )
 
         publish_to_channel(
@@ -562,22 +566,54 @@ class GameController(Controller):
         user1_id: int,
         user2_id: int,
         connection_id: int,
-        question_service: QuestionService,
         connection_question_service: ConnectionQuestionService,
+        user_answer_service: UserAnswerService,
     ) -> None:
-        # Get all available game questions
-        available_questions = await question_service.list(Question.is_game_question.is_(True))
+        """Create connection questions by assigning each user questions from their partner's signup answers.
 
-        if len(available_questions) < GAME_QUESTIONS_COUNT:
-            raise ValueError("Not enough game questions available. Need at least 6 questions.")
+        User1 gets questions from User2's signup answers (so User1 asks User2 about User2's answers).
+        User2 gets questions from User1's signup answers (so User2 asks User1 about User1's answers).
+        This ensures each user asks their partner about questions the partner actually answered.
 
-        # Randomly select questions from available questions
-        selected_questions = random.sample(available_questions, GAME_QUESTIONS_COUNT)
+        Args:
+            user1_id: ID of the first user (QR code presenter)
+            user2_id: ID of the second user (QR code scanner)
+            connection_id: ID of the connection between the users
+            question_service: Service for accessing questions (unused but kept for interface consistency)
+            connection_question_service: Service for managing connection questions
+            user_answer_service: Service for accessing user answers
 
-        # Randomly assign questions to each user
-        random.shuffle(selected_questions)
-        user1_questions = selected_questions[: GAME_QUESTIONS_COUNT // 2]
-        user2_questions = selected_questions[GAME_QUESTIONS_COUNT // 2 :]
+        Raises:
+            ValueError: If either user doesn't have enough signup answers
+
+        """
+        # Get the questions each user answered during signup
+        user1_answers = await user_answer_service.list(user_id=user1_id)
+        user2_answers = await user_answer_service.list(user_id=user2_id)
+
+        # Each user needs at least half of GAME_QUESTIONS_COUNT for the other to ask about
+        questions_per_user = GAME_QUESTIONS_COUNT // 2
+
+        if len(user1_answers) < questions_per_user:
+            error_msg = (
+                f"User1 doesn't have enough signup answers. "
+                f"Found {len(user1_answers)}, need at least {questions_per_user}."
+            )
+            raise ValueError(error_msg)
+
+        if len(user2_answers) < questions_per_user:
+            error_msg = (
+                f"User2 doesn't have enough signup answers. "
+                f"Found {len(user2_answers)}, need at least {questions_per_user}."
+            )
+            raise ValueError(error_msg)
+
+        # Randomly select questions from each user's answers
+        # User1 will be assigned questions from User2's signup answers (User1 asks User2)
+        user1_assigned_questions = random.sample(user2_answers, questions_per_user)
+
+        # User2 will be assigned questions from User1's signup answers (User2 asks User1)
+        user2_assigned_questions = random.sample(user1_answers, questions_per_user)
 
         # Create connection question records
         connection_questions_data = [
@@ -586,18 +622,18 @@ class GameController(Controller):
                 "answered_correctly": False,
                 "user_id": user1_id,
                 "connection_id": connection_id,
-                "question_id": question.id,
+                "question_id": answer.question_id,
             }
-            for question in user1_questions
+            for answer in user1_assigned_questions
         ] + [
             {
                 "question_answered": False,
                 "answered_correctly": False,
                 "user_id": user2_id,
                 "connection_id": connection_id,
-                "question_id": question.id,
+                "question_id": answer.question_id,
             }
-            for question in user2_questions
+            for answer in user2_assigned_questions
         ]
 
         await connection_question_service.create_many(connection_questions_data)

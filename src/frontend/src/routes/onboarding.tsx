@@ -65,10 +65,18 @@ export default function OnboardingPage() {
       const response = await apiQuestionsGetQuestions()
 
       if (response.status === 200 && response.data) {
-        const signupQuestions = response.data.items?.filter((q) => q.is_signup_question)
-        setQuestions(signupQuestions || [])
+        const signupQuestions = response.data.items
 
-        if (signupQuestions?.length === 0) {
+        // If there are more than 10 questions, shuffle and pick first 10
+        let finalQuestions = signupQuestions || []
+        if (finalQuestions.length > 10) {
+          const shuffled = [...finalQuestions].sort(() => Math.random() - 0.5)
+          finalQuestions = shuffled.slice(0, 10)
+        }
+
+        setQuestions(finalQuestions)
+
+        if (finalQuestions.length === 0) {
           setStep("registration")
         }
       } else {

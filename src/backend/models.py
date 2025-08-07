@@ -92,15 +92,19 @@ class User(BigIntAuditBase):
 class Question(BigIntAuditBase):
     """Represents a predefined question used in the game.
 
-    Questions can be asked during signup.
+    Users can answer any 10 questions from the available questions during signup.
+    Each user must answer exactly 10 unique questions (no duplicates allowed).
     """
 
     __tablename__ = "questions"
 
     question: Mapped[str]
-    is_signup_question: Mapped[bool] = mapped_column(default=True)  # True if asked during user signup
-    is_game_question: Mapped[bool] = mapped_column(default=True)  # True if asked during a connection game round
-
+    is_signup_question: Mapped[bool] = mapped_column(
+        default=True,
+    )  # True if asked during user signup # NOTE: not used yet
+    is_game_question: Mapped[bool] = mapped_column(
+        default=True,
+    )  # True if asked during a connection game round # NOTE: not used yet
     # -----------------
     # ORM Relationships
     # -----------------

@@ -11,7 +11,7 @@ class PostUser(Struct):
     name: Annotated[str, Meta(min_length=1)]
     email: Annotated[str, Meta(min_length=1)]
     event_code: Annotated[str, Meta(min_length=1, max_length=64)]
-    user_answer: list[PostUserAnswer]
+    user_answer: Annotated[list[PostUserAnswer], Meta(min_length=10, max_length=10)]
 
 
 class GetUser(Struct):

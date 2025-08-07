@@ -41,12 +41,19 @@ class UserController(Controller):
         if data.email not in whitelist:
             raise PermissionDeniedException
 
-        signup_questions = await question_service.list(is_signup_question=True)
+        signup_questions = await question_service.list()
         signup_questions_ids = {question.id for question in signup_questions}
-        user_answers_questions_ids = {answer.question_id for answer in data.user_answer}
 
-        if user_answers_questions_ids != signup_questions_ids:
-            raise PermissionDeniedException("Please answer all signup questions.")
+        user_answers_questions_ids = [answer.question_id for answer in data.user_answer]
+        user_answers_questions_set = set(user_answers_questions_ids)
+
+        # Validate that all answered questions are unique (no duplicates)
+        if len(user_answers_questions_set) != len(user_answers_questions_ids):
+            raise PermissionDeniedException("You cannot answer the same question twice.")
+
+        # Validate that all answered questions exist in the database
+        if not user_answers_questions_set.issubset(signup_questions_ids):
+            raise PermissionDeniedException("Some of the answered questions do not exist.")
 
         user = await user_service.create(
             data={
