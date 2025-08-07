@@ -199,7 +199,6 @@ class GameController(Controller):
         request: Request,
         user_service: UserService,
         connection_service: ConnectionService,
-        question_service: QuestionService,
         connection_question_service: ConnectionQuestionService,
         user_answer_service: UserAnswerService,
     ) -> None:
