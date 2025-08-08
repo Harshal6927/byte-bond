@@ -192,7 +192,7 @@ class ConnectionQuestion(BigIntAuditBase):
     __tablename__ = "connection_questions"
     __table_args__ = (
         # Ensure each question is only asked once per connection
-        UniqueConstraint("connection_id", "question_id", name="uq_connection_question"),
+        UniqueConstraint("connection_id", "question_id", "user_id", name="uq_connection_question"),
     )
 
     question_answered: Mapped[bool] = mapped_column(default=False)

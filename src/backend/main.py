@@ -65,6 +65,7 @@ app = Litestar(
             NotAuthorizedException,
             NotFoundException,
         },
+        log_exceptions="always",
     ),
     exception_handlers={
         Exception: exception_handler,
