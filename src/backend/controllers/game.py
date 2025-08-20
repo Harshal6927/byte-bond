@@ -271,11 +271,12 @@ class GameController(Controller):
         user: User = request.user
 
         # Get user's current active connection
-        current_connection: Connection = await self._get_user_active_connection(
+        current_connection = await self._get_user_active_connection(
             user_id=user.id,
             event_id=user.event_id,
             connection_service=connection_service,
         )
+
         if not current_connection or current_connection.status != ConnectionStatus.ACTIVE:
             raise NotFoundException(
                 detail="No active connection found",

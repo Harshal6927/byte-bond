@@ -69,7 +69,7 @@ async def _retrieve_user_handler(
 
 jwt_cookie_auth = JWTCookieAuth[User](
     retrieve_user_handler=_retrieve_user_handler,
-    token_secret=settings.secret_key,
+    token_secret=settings.secret_key or "supersecretkey",
     default_token_expiration=timedelta(days=1),
     exclude=["/schema", "/saq"],
     samesite="strict",

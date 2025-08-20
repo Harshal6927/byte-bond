@@ -35,10 +35,10 @@ class Settings:
     debug: bool = field(
         default_factory=lambda: os.getenv("DEBUG", "false").lower() in {"true", "1", "yes"},
     )
-    db_connection_string: str = field(
+    db_connection_string: str | None = field(
         default_factory=lambda: os.getenv("DB_CONNECTION_STRING"),
     )
-    secret_key: str = field(
+    secret_key: str | None = field(
         default_factory=lambda: os.getenv("SECRET_KEY"),
     )
     vite: ViteSettings = field(default_factory=ViteSettings)

@@ -1,5 +1,3 @@
-from typing import Any
-
 import click
 from click import Group
 from litestar.plugins import CLIPluginProtocol
@@ -7,7 +5,7 @@ from litestar.plugins import CLIPluginProtocol
 
 @click.group(name="users", invoke_without_command=False, help="Manage application users.")
 @click.pass_context
-def user_management_group(_: dict[str, Any]) -> None:
+def user_management_group(_: click.Context) -> None:
     """Manage application users."""
 
 

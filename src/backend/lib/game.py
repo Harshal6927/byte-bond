@@ -13,10 +13,12 @@ MINIMUM_REQUIRED_USERS = 2
 
 
 async def _create_connection(user_service: UserService, connection_service: ConnectionService, event: Event) -> None:
-    available_users = await user_service.list(
-        event_id=event.id,
-        status=UserStatus.AVAILABLE,
-        is_admin=False,
+    available_users = list(
+        await user_service.list(
+            event_id=event.id,
+            status=UserStatus.AVAILABLE,
+            is_admin=False,
+        ),
     )
 
     if len(available_users) < MINIMUM_REQUIRED_USERS:
