@@ -268,10 +268,10 @@ function LeaderboardPage() {
                     {leaderboard.event_name}
                   </div>
 
-                  <span className="flex items-center gap-2">
+                  {/* <span className="flex items-center gap-2">
                     <Users className="h-5 w-5" />
                     <strong>{leaderboard.total_users}</strong> total participants
-                  </span>
+                  </span> */}
                 </CardTitle>
               </CardHeader>
             </Card>

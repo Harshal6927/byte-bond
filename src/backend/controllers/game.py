@@ -1,4 +1,5 @@
 import random
+from typing import Any
 
 from advanced_alchemy.filters import LimitOffset
 from litestar import Request, get, post
@@ -106,7 +107,7 @@ class GameController(Controller):
         event = await event_service.get(event_id)
 
         users = await user_service.list(
-            LimitOffset(limit=20, offset=0),
+            LimitOffset(limit=10, offset=0),
             order_by=[
                 User.points.desc(),
                 User.connection_count.desc(),
@@ -148,7 +149,7 @@ class GameController(Controller):
     @get("/status")
     async def get_game_status(
         self,
-        request: Request,
+        request: Request[User, Any, Any],
         user_service: UserService,
         question_service: QuestionService,
         connection_service: ConnectionService,
@@ -196,7 +197,7 @@ class GameController(Controller):
     async def scan_qr_code(
         self,
         data: QRScanRequest,
-        request: Request,
+        request: Request[User, Any, Any],
         user_service: UserService,
         connection_service: ConnectionService,
         connection_question_service: ConnectionQuestionService,
@@ -263,7 +264,7 @@ class GameController(Controller):
     async def answer_question(
         self,
         data: GameQuestionResponse,
-        request: Request,
+        request: Request[User, Any, Any],
         connection_service: ConnectionService,
         connection_question_service: ConnectionQuestionService,
         user_service: UserService,
@@ -346,7 +347,7 @@ class GameController(Controller):
     @post("/complete-connection")
     async def complete_connection(
         self,
-        request: Request,
+        request: Request[User, Any, Any],
         connection_service: ConnectionService,
         connection_question_service: ConnectionQuestionService,
         user_service: UserService,
@@ -420,7 +421,7 @@ class GameController(Controller):
     @post("/cancel-connection")
     async def cancel_connection(
         self,
-        request: Request,
+        request: Request[User, Any, Any],
         connection_service: ConnectionService,
         user_service: UserService,
     ) -> None:
@@ -496,7 +497,7 @@ class GameController(Controller):
     async def chat(
         self,
         data: GameChatRequest,
-        request: Request,
+        request: Request[User, Any, Any],
         connection_service: ConnectionService,
     ) -> None:
         user: User = request.user

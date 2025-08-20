@@ -1,3 +1,5 @@
+from typing import Any
+
 from advanced_alchemy.service.pagination import OffsetPagination
 from litestar import Request, delete, get, patch, post
 from litestar.controller import Controller
@@ -12,6 +14,7 @@ from src.backend.lib.dependencies import (
 )
 from src.backend.lib.services import EventService, QuestionService, UserAnswerService, UserService
 from src.backend.lib.utils import admin_user_guard
+from src.backend.models import User
 from src.backend.schema.user import GetUser, PatchUser, PostUser
 
 
@@ -99,7 +102,7 @@ class UserController(Controller):
         user_id: int,
         data: PatchUser,
         user_service: UserService,
-        request: Request,
+        request: Request[User, Any, Any],
     ) -> GetUser:
         if request.user.id != user_id and not request.user.is_admin:
             raise NotAuthorizedException

@@ -1,3 +1,5 @@
+from typing import Any
+
 from advanced_alchemy.service.pagination import OffsetPagination
 from litestar import Request, delete, get, patch, post
 from litestar.controller import Controller
@@ -7,6 +9,7 @@ from litestar.exceptions import NotAuthorizedException
 from src.backend.lib.dependencies import provide_user_answer_service
 from src.backend.lib.services import UserAnswerService
 from src.backend.lib.utils import admin_user_guard
+from src.backend.models import User
 from src.backend.schema.user_answer import GetUserAnswer, PatchUserAnswer, PostUserAnswer
 
 
@@ -22,7 +25,7 @@ class UserAnswerController(Controller):
         self,
         data: PostUserAnswer,
         user_answer_service: UserAnswerService,
-        request: Request,
+        request: Request[User, Any, Any],
     ) -> GetUserAnswer:
         user_answer = await user_answer_service.create(
             data={
@@ -37,7 +40,7 @@ class UserAnswerController(Controller):
     async def get_user_answers(
         self,
         user_answer_service: UserAnswerService,
-        request: Request,
+        request: Request[User, Any, Any],
     ) -> OffsetPagination[GetUserAnswer]:
         # User can only see their own answers
         user_answers = await user_answer_service.list(user_id=request.user.id)
@@ -56,7 +59,7 @@ class UserAnswerController(Controller):
         self,
         user_answer_id: int,
         user_answer_service: UserAnswerService,
-        request: Request,
+        request: Request[User, Any, Any],
     ) -> GetUserAnswer:
         user_answer = await user_answer_service.get(user_answer_id)
         # User can only access their own answers
@@ -70,7 +73,7 @@ class UserAnswerController(Controller):
         user_answer_id: int,
         data: PatchUserAnswer,
         user_answer_service: UserAnswerService,
-        request: Request,
+        request: Request[User, Any, Any],
     ) -> GetUserAnswer:
         # User can only update their own answers
         existing_answer = await user_answer_service.get(user_answer_id)

@@ -1,3 +1,5 @@
+from typing import Any
+
 from litestar import Request, Response, get, post
 from litestar.controller import Controller
 from litestar.datastructures import Cookie
@@ -6,6 +8,7 @@ from litestar.di import Provide
 from src.backend.config import jwt_cookie_auth
 from src.backend.lib.dependencies import provide_event_service, provide_user_service
 from src.backend.lib.services import EventService, UserService
+from src.backend.models import User
 from src.backend.schema.auth import PostLogin
 from src.backend.schema.user import GetUser
 
@@ -47,7 +50,7 @@ class AuthController(Controller):
     @get("/me")
     async def get_user(
         self,
-        request: Request,
+        request: Request[User, Any, Any],
         users_service: UserService,
     ) -> GetUser:
         return users_service.to_schema(request.user, schema_type=GetUser)
