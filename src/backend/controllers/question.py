@@ -39,7 +39,7 @@ class QuestionController(Controller):
         question_id: int,
         question_service: QuestionService,
     ) -> GetQuestion:
-        question = await question_service.get(question_id)
+        question = await question_service.get_one(id=question_id)
         return question_service.to_schema(question, schema_type=GetQuestion)
 
     @patch("/{question_id:int}", guards=[admin_user_guard])

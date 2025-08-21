@@ -93,7 +93,7 @@ class UserController(Controller):
         user_id: int,
         user_service: UserService,
     ) -> GetUser:
-        user = await user_service.get(user_id)
+        user = await user_service.get_one(id=user_id)
         return user_service.to_schema(user, schema_type=GetUser)
 
     @patch("/{user_id:int}")

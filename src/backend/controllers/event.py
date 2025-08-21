@@ -51,7 +51,7 @@ class EventController(Controller):
         event_id: int,
         event_service: EventService,
     ) -> GetEvent:
-        event = await event_service.get(event_id)
+        event = await event_service.get_one(id=event_id)
         return event_service.to_schema(event, schema_type=GetEvent)
 
     @patch("/{event_id:int}")

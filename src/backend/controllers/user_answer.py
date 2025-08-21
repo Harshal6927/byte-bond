@@ -61,7 +61,7 @@ class UserAnswerController(Controller):
         user_answer_service: UserAnswerService,
         request: Request[User, Any, Any],
     ) -> GetUserAnswer:
-        user_answer = await user_answer_service.get(user_answer_id)
+        user_answer = await user_answer_service.get_one(id=user_answer_id)
         # User can only access their own answers
         if user_answer.user_id != request.user.id and not request.user.is_admin:
             raise NotAuthorizedException
@@ -76,7 +76,7 @@ class UserAnswerController(Controller):
         request: Request[User, Any, Any],
     ) -> GetUserAnswer:
         # User can only update their own answers
-        existing_answer = await user_answer_service.get(user_answer_id)
+        existing_answer = await user_answer_service.get_one(id=user_answer_id)
         if existing_answer.user_id != request.user.id and not request.user.is_admin:
             raise NotAuthorizedException
 

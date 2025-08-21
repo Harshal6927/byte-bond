@@ -104,7 +104,7 @@ class GameController(Controller):
         event_service: EventService,
         user_service: UserService,
     ) -> Leaderboard:
-        event = await event_service.get(event_id)
+        event = await event_service.get_one(id=event_id)
 
         users = await user_service.list(
             LimitOffset(limit=10, offset=0),
@@ -173,9 +173,11 @@ class GameController(Controller):
                 qr_code = user.qr_code
 
             # Get partner's name
-            partner = await user_service.get(
-                current_connection.user2_id if current_connection.user1_id == user.id else current_connection.user1_id,
+            partner_id = (
+                current_connection.user2_id if current_connection.user1_id == user.id else current_connection.user1_id
             )
+            partner = await user_service.get_one(id=partner_id)
+
             partner_name = partner.name
 
             # Get connection questions data for the current user
@@ -217,7 +219,7 @@ class GameController(Controller):
             raise NotAuthorizedException
 
         # Verify the QR code matches user1's QR code
-        user1 = await user_service.get(current_connection.user1_id)
+        user1 = await user_service.get_one(id=current_connection.user1_id)
         if user1.qr_code != data.qr_code:
             raise NotAuthorizedException(detail="Invalid QR code scanned")
 
@@ -304,7 +306,7 @@ class GameController(Controller):
         other_user_id = (
             current_connection.user2_id if current_connection.user1_id == user.id else current_connection.user1_id
         )
-        other_user = await user_service.get(other_user_id, load=[User.answers])
+        other_user = await user_service.get_one(id=other_user_id, load=[User.answers])
 
         other_user_answer = None
         for answer in other_user.answers:
@@ -385,8 +387,8 @@ class GameController(Controller):
         )
 
         # Update connection counts and set users back to available
-        user1 = await user_service.get(current_connection.user1_id)
-        user2 = await user_service.get(current_connection.user2_id)
+        user1 = await user_service.get_one(id=current_connection.user1_id)
+        user2 = await user_service.get_one(id=current_connection.user2_id)
 
         await user_service.update_many(
             data=[
