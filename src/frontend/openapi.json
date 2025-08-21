@@ -1158,6 +1158,32 @@
                 ],
                 "summary": "GetQuestions",
                 "operationId": "ApiQuestionsGetQuestions",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        },
+                        "required": false,
+                        "deprecated": false,
+                        "allowEmptyValue": false,
+                        "allowReserved": false
+                    },
+                    {
+                        "name": "onboarding",
+                        "in": "query",
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
+                        },
+                        "required": false,
+                        "deprecated": false,
+                        "allowEmptyValue": false,
+                        "allowReserved": false
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Request fulfilled, document follows",
@@ -1186,6 +1212,44 @@
                                         }
                                     },
                                     "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request syntax or unsupported method",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "status_code": {
+                                            "type": "integer"
+                                        },
+                                        "detail": {
+                                            "type": "string"
+                                        },
+                                        "extra": {
+                                            "additionalProperties": {},
+                                            "type": [
+                                                "null",
+                                                "object",
+                                                "array"
+                                            ]
+                                        }
+                                    },
+                                    "type": "object",
+                                    "required": [
+                                        "detail",
+                                        "status_code"
+                                    ],
+                                    "description": "Validation Exception",
+                                    "examples": [
+                                        {
+                                            "status_code": 400,
+                                            "detail": "Bad Request",
+                                            "extra": {}
+                                        }
+                                    ]
                                 }
                             }
                         }
@@ -2150,6 +2214,9 @@
                     "question": {
                         "type": "string"
                     },
+                    "question_type": {
+                        "$ref": "#/components/schemas/QuestionType"
+                    },
                     "is_signup_question": {
                         "type": "boolean"
                     },
@@ -2172,6 +2239,7 @@
                     "is_game_question",
                     "is_signup_question",
                     "question",
+                    "question_type",
                     "updated_at"
                 ],
                 "title": "GetQuestion"
@@ -2377,6 +2445,13 @@
                         ],
                         "minLength": 1
                     },
+                    "question_type": {
+                        "oneOf": [
+                            {
+                                "$ref": "#/components/schemas/QuestionType"
+                            }
+                        ]
+                    },
                     "is_signup_question": {
                         "oneOf": [
                             {
@@ -2470,6 +2545,9 @@
                         "type": "string",
                         "minLength": 1
                     },
+                    "question_type": {
+                        "$ref": "#/components/schemas/QuestionType"
+                    },
                     "is_signup_question": {
                         "type": "boolean"
                     },
@@ -2481,7 +2559,8 @@
                 "required": [
                     "is_game_question",
                     "is_signup_question",
-                    "question"
+                    "question",
+                    "question_type"
                 ],
                 "title": "PostQuestion"
             },
@@ -2565,6 +2644,15 @@
                     "your_answer"
                 ],
                 "title": "QuestionResult"
+            },
+            "QuestionType": {
+                "type": "string",
+                "enum": [
+                    "multiple_choice",
+                    "true_false",
+                    "default"
+                ],
+                "title": "QuestionType"
             },
             "UserStatus": {
                 "type": "string",

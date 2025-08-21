@@ -62,7 +62,13 @@ export default function OnboardingPage() {
   useEffect(() => {
     const loadQuestions = async () => {
       setIsLoadingQuestions(true)
-      const response = await apiQuestionsGetQuestions()
+
+      const response = await apiQuestionsGetQuestions({
+        query: {
+          limit: 5,
+          onboarding: true,
+        },
+      })
 
       if (response.status === 200 && response.data) {
         const signupQuestions = response.data.items

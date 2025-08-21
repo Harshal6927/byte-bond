@@ -1,7 +1,9 @@
+from advanced_alchemy.filters import LimitOffset, OrderBy
 from advanced_alchemy.service.pagination import OffsetPagination
 from litestar import delete, get, patch, post
 from litestar.controller import Controller
 from litestar.di import Provide
+from sqlalchemy import func
 
 from src.backend.lib.dependencies import provide_question_service
 from src.backend.lib.services import QuestionService
@@ -29,8 +31,23 @@ class QuestionController(Controller):
     async def get_questions(
         self,
         question_service: QuestionService,
+        limit: int = 10,
+        onboarding: bool = False,
     ) -> OffsetPagination[GetQuestion]:
-        questions = await question_service.list()
+        if limit < 0:  # If limit is negative, return all questions
+            questions = await question_service.list()
+        elif onboarding:  # If onboarding is true, keep the signup questions first
+            questions = await question_service.list(
+                OrderBy("is_signup_question", "desc"),
+                OrderBy("is_game_question", "asc"),
+                OrderBy(func.random()),  # pyright: ignore[reportArgumentType]
+                LimitOffset(limit=limit, offset=0),
+            )
+        else:
+            questions = await question_service.list(
+                OrderBy(func.random()),  # pyright: ignore[reportArgumentType]
+                LimitOffset(limit=limit, offset=0),
+            )
         return question_service.to_schema(questions, schema_type=GetQuestion)
 
     @get("/{question_id:int}", exclude_from_auth=True)

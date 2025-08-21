@@ -21,6 +21,12 @@ class UserStatus(StrEnum):
     BUSY = "busy"
 
 
+class QuestionType(StrEnum):
+    MCQ = "multiple_choice"
+    TRUE_FALSE = "true_false"
+    DEFAULT = "default"
+
+
 class Event(BigIntAuditBase):
     """Represents an event, which groups users together.
 
@@ -99,12 +105,9 @@ class Question(BigIntAuditBase):
     __tablename__ = "questions"
 
     question: Mapped[str]
-    is_signup_question: Mapped[bool] = mapped_column(
-        default=True,
-    )  # True if asked during user signup # NOTE: not used yet
-    is_game_question: Mapped[bool] = mapped_column(
-        default=True,
-    )  # True if asked during a connection game round # NOTE: not used yet
+    question_type: Mapped[QuestionType] = mapped_column(default=QuestionType.DEFAULT)
+    is_signup_question: Mapped[bool] = mapped_column(default=True)
+    is_game_question: Mapped[bool] = mapped_column(default=True)
     # -----------------
     # ORM Relationships
     # -----------------

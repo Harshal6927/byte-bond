@@ -33,14 +33,20 @@ class UserAdminView(ModelView, model=User):
 
 
 class QuestionAdminView(ModelView, model=Question):
-    column_list = [Question.id, Question.question, Question.is_signup_question, Question.is_game_question]
+    column_list = [
+        Question.id,
+        Question.question,
+        Question.question_type,
+        Question.is_signup_question,
+        Question.is_game_question,
+    ]
     form_excluded_columns = [
         Question.user_answers,
         Question.connection_questions,
         Question.created_at,
         Question.updated_at,
     ]
-    column_searchable_list = [Question.question]
+    column_searchable_list = [Question.question, Question.question_type]
 
 
 class UserAnswerAdminView(ModelView, model=UserAnswer):

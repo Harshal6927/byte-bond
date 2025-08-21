@@ -71,6 +71,7 @@ export type GetEvent = {
 export type GetQuestion = {
     id: number;
     question: string;
+    question_type: QuestionType;
     is_signup_question: boolean;
     is_game_question: boolean;
     created_at: string;
@@ -145,6 +146,7 @@ export type PatchEvent = {
  */
 export type PatchQuestion = {
     question?: string;
+    question_type?: QuestionType;
     is_signup_question?: boolean;
     is_game_question?: boolean;
 };
@@ -184,6 +186,7 @@ export type PostLogin = {
  */
 export type PostQuestion = {
     question: string;
+    question_type: QuestionType;
     is_signup_question: boolean;
     is_game_question: boolean;
 };
@@ -221,6 +224,11 @@ export type QuestionResult = {
     expected_answer: string;
     your_answer: string;
 };
+
+/**
+ * QuestionType
+ */
+export type QuestionType = 'multiple_choice' | 'true_false' | 'default';
 
 /**
  * UserStatus
@@ -756,9 +764,25 @@ export type ApiQuestionsQuestionIdPatchQuestionResponse = ApiQuestionsQuestionId
 export type ApiQuestionsGetQuestionsData = {
     body?: never;
     path?: never;
-    query?: never;
+    query?: {
+        limit?: number;
+        onboarding?: boolean;
+    };
     url: '/api/questions';
 };
+
+export type ApiQuestionsGetQuestionsErrors = {
+    /**
+     * Validation Exception
+     */
+    400: {
+        status_code: number;
+        detail: string;
+        extra?: null | Array<unknown> | Array<unknown>;
+    };
+};
+
+export type ApiQuestionsGetQuestionsError = ApiQuestionsGetQuestionsErrors[keyof ApiQuestionsGetQuestionsErrors];
 
 export type ApiQuestionsGetQuestionsResponses = {
     /**
