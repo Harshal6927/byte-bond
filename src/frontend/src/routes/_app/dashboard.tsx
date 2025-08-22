@@ -221,7 +221,11 @@ function DashboardPage() {
             <div>
               <a href="https://litestar.dev/" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-1">
                 <span>Powered by</span>
-                <img src="/litestar.svg" width="25" height="25" alt="Litestar logo" className="inline-block" />
+                {process.env.NODE_ENV === "production" ? (
+                  <img src="/static/litestar.svg" width="25" height="25" alt="Litestar logo" className="inline-block" />
+                ) : (
+                  <img src="/litestar.svg" width="25" height="25" alt="Litestar logo" className="inline-block" />
+                )}
                 <span className="font-medium text-[#edb641]">Litestar</span>
               </a>
             </div>

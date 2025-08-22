@@ -423,7 +423,11 @@ function LeaderboardPage() {
           <div className="flex items-center gap-2 text-muted-foreground text-sm">
             <span>Powered by</span>
             <div className="flex items-center gap-1">
-              <img src="/litestar.svg" width="55" height="55" alt="Litestar logo" />
+              {process.env.NODE_ENV === "production" ? (
+                <img src="/static/litestar.svg" width="55" height="55" alt="Litestar logo" />
+              ) : (
+                <img src="/litestar.svg" width="55" height="55" alt="Litestar logo" />
+              )}
               <span className="font-medium text-2xl text-[#edb641]">Litestar</span>
             </div>
           </div>
