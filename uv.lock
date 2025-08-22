@@ -72,10 +72,10 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "advanced-alchemy", specifier = ">=1.4.5" },
-    { name = "litestar", extras = ["jwt", "opentelemetry", "standard"], specifier = ">=2.16.0" },
+    { name = "advanced-alchemy", specifier = ">=1.6.0" },
+    { name = "litestar", extras = ["jwt", "opentelemetry", "standard"], specifier = ">=2.17.0" },
     { name = "litestar-saq", specifier = ">=0.5.3" },
-    { name = "litestar-vite", specifier = ">=0.13.2" },
+    { name = "litestar-vite", specifier = ">=0.14.0" },
     { name = "logfire", specifier = ">=4.1.0" },
     { name = "pre-commit", specifier = ">=4.2.0" },
     { name = "psycopg", extras = ["binary", "pool"], specifier = ">=3.2.9" },
@@ -499,9 +499,6 @@ wheels = [
 ]
 
 [package.optional-dependencies]
-jinja = [
-    { name = "jinja2" },
-]
 jwt = [
     { name = "cryptography" },
     { name = "pyjwt" },
@@ -541,19 +538,19 @@ wheels = [
 
 [[package]]
 name = "litestar-vite"
-version = "0.13.2"
+version = "0.14.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "litestar", extra = ["jinja"] },
+    { name = "litestar" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/6c/6f/450287a0c9c47d72938fcb7bf003021a662b373d2d0aba51f7fa9be2604b/litestar_vite-0.13.2.tar.gz", hash = "sha256:b7bf6b861955580f22a584a10e1cbf048b3a15989cc172908ee76ba934bc4540", size = 61137, upload-time = "2025-05-05T13:39:47.317Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/dc/64/20ab075abf8888f0369d22cfb119b9d1b67d4fb2b029d584d57a9a6cec88/litestar_vite-0.14.0.tar.gz", hash = "sha256:6da449fb346a9200b912454d94ac76e691f19b2a2d56b4c8a8e80845775d2a40", size = 73906, upload-time = "2025-08-21T22:51:31.708Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/51/17/bcc7b1c1d79c3bc61a30cf6db9323955b52e6045d14b78897efb81eb81ef/litestar_vite-0.13.2-py3-none-any.whl", hash = "sha256:726aa191ad8851c848d80902f7ca25e5c8db08369d8c5b6c20a4e4a1abd0abbe", size = 34875, upload-time = "2025-05-05T13:39:45.4Z" },
+    { url = "https://files.pythonhosted.org/packages/4b/61/0a7e1e51cd98f44fbd7c940b384e47f911c99c52140a750a40900b5e4217/litestar_vite-0.14.0-py3-none-any.whl", hash = "sha256:d6e3e4f0dff5c96a61345c72669041fefd8d0db26ab25041034a19185431c562", size = 35781, upload-time = "2025-08-21T22:51:30.041Z" },
 ]
 
 [[package]]
 name = "logfire"
-version = "4.3.3"
+version = "4.3.4"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "executing" },
@@ -564,9 +561,9 @@ dependencies = [
     { name = "rich" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/ca/9c/1a575014f5da17a13b5dc5fe457f4734a7810be5a4cd4d0c9ef441b235a3/logfire-4.3.3.tar.gz", hash = "sha256:ca11650480793f5d0760f614684bff027e5c0e08379d8b4d236acc6f6dc5ae17", size = 515840, upload-time = "2025-08-13T11:23:08.451Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/4d/29/e1c0cf4e476fed07d6ebe5c49524d2c19d5ab71a48afefa492ca45a7e0d0/logfire-4.3.4.tar.gz", hash = "sha256:be49a2db4cfbffb0631ee676dc711dca63e9032839b2cb7596270ec72cd3eb23", size = 518417, upload-time = "2025-08-21T18:55:22.57Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/1b/db/f4b3bd0b99b0c6ff6c988e8a30a01743b0435b5f5fd555f5db356486a5cc/logfire-4.3.3-py3-none-any.whl", hash = "sha256:61fac5508ee2cef49c42cc2598b109634f7b7ea2c81dddd2e3ec7f3a5a2742ee", size = 213523, upload-time = "2025-08-13T11:23:05.376Z" },
+    { url = "https://files.pythonhosted.org/packages/c8/d3/f69e52f1864ccf5c86a5117eca59153aa61534e5f8cb9d078a97e83aac15/logfire-4.3.4-py3-none-any.whl", hash = "sha256:67ddcd66697671712d6dd51a1bf49149f558b9e9db9a705a9b27160ae7e530c8", size = 213805, upload-time = "2025-08-21T18:55:18.159Z" },
 ]
 
 [[package]]

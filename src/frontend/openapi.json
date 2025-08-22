@@ -2217,6 +2217,19 @@
                     "question_type": {
                         "$ref": "#/components/schemas/QuestionType"
                     },
+                    "options": {
+                        "oneOf": [
+                            {
+                                "items": {
+                                    "type": "string"
+                                },
+                                "type": "array"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
                     "is_signup_question": {
                         "type": "boolean"
                     },
@@ -2452,6 +2465,19 @@
                             }
                         ]
                     },
+                    "options": {
+                        "oneOf": [
+                            {
+                                "items": {
+                                    "type": "string"
+                                },
+                                "type": "array"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
                     "is_signup_question": {
                         "oneOf": [
                             {
@@ -2547,6 +2573,19 @@
                     },
                     "question_type": {
                         "$ref": "#/components/schemas/QuestionType"
+                    },
+                    "options": {
+                        "oneOf": [
+                            {
+                                "items": {
+                                    "type": "string"
+                                },
+                                "type": "array"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
                     },
                     "is_signup_question": {
                         "type": "boolean"

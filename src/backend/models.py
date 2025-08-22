@@ -106,6 +106,7 @@ class Question(BigIntAuditBase):
 
     question: Mapped[str]
     question_type: Mapped[QuestionType] = mapped_column(default=QuestionType.DEFAULT)
+    options: Mapped[list[str] | None] = mapped_column(JsonB, default=None, nullable=True)  # For MCQs or True/False
     is_signup_question: Mapped[bool] = mapped_column(default=True)
     is_game_question: Mapped[bool] = mapped_column(default=True)
     # -----------------

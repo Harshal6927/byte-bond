@@ -72,6 +72,7 @@ export type GetQuestion = {
     id: number;
     question: string;
     question_type: QuestionType;
+    options?: Array<string> | null;
     is_signup_question: boolean;
     is_game_question: boolean;
     created_at: string;
@@ -147,6 +148,7 @@ export type PatchEvent = {
 export type PatchQuestion = {
     question?: string;
     question_type?: QuestionType;
+    options?: Array<string> | null;
     is_signup_question?: boolean;
     is_game_question?: boolean;
 };
@@ -187,6 +189,7 @@ export type PostLogin = {
 export type PostQuestion = {
     question: string;
     question_type: QuestionType;
+    options?: Array<string> | null;
     is_signup_question: boolean;
     is_game_question: boolean;
 };
