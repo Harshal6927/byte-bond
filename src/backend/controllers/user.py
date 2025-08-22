@@ -42,7 +42,7 @@ class UserController(Controller):
         whitelist = event.whitelist.get("emails", [])
 
         if data.email not in whitelist:
-            raise PermissionDeniedException
+            raise PermissionDeniedException("Your email is not whitelisted for this event.")
 
         signup_questions = await question_service.list()
         signup_questions_ids = {question.id for question in signup_questions}

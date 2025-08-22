@@ -65,7 +65,7 @@ export default function OnboardingPage() {
 
       const response = await apiQuestionsGetQuestions({
         query: {
-          limit: 5,
+          limit: 10, // TODO: ask for event code first then fetch event details to get max questions
           onboarding: true,
         },
       })

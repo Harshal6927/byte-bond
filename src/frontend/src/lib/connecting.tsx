@@ -387,7 +387,7 @@ export function Connecting({ gameStatus, user }: ConnectingProps) {
             </div>
             <div>
               <p className="font-medium text-slate-300">Answer questions</p>
-              <p className="text-slate-400 text-sm">Learn about each other through fun questions</p>
+              <p className="text-slate-400 text-sm">Your partner will ask you the questions that you've answered during registration</p>
             </div>
           </div>
           <div className="flex items-start gap-4">
@@ -427,19 +427,21 @@ export function Connecting({ gameStatus, user }: ConnectingProps) {
       </Button> */}
 
       {/* Floating Chat Button - Only show if we have a partner */}
-      {gameStatus.partner_name && (
+      {!gameStatus.partner_name && (
         <Drawer open={isChatOpen} onOpenChange={setIsChatOpen}>
           <DrawerTrigger asChild>
             <div className="fixed right-4 bottom-4 z-50">
-              <Button className="relative h-14 w-14 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 p-0 shadow-xl transition-all duration-200 hover:scale-105 hover:from-blue-600 hover:to-purple-700 hover:shadow-2xl">
-                <MessageCircle className="h-6 w-6 text-white" />
-                {/* Unread message count indicator */}
-                {unreadCount > 0 && (
-                  <div className="-right-1 -top-1 absolute flex h-6 w-6 items-center justify-center rounded-full border-2 border-slate-800 bg-red-500">
-                    <span className="font-bold text-white text-xs">{unreadCount > 9 ? "9+" : unreadCount}</span>
-                  </div>
-                )}
-              </Button>
+              <div className="animate-gradient rounded-full bg-gradient-to-r from-blue-500 via-purple-600 to-pink-600 p-0.5">
+                <Button className="relative h-14 w-14 rounded-full bg-gradient-to-r from-blue-500 to-purple-600 p-0 shadow-xl transition-all duration-200 hover:scale-105 hover:from-blue-600 hover:to-purple-700 hover:shadow-2xl">
+                  <MessageCircle className="text-white" />
+                  {/* Unread message count indicator */}
+                  {unreadCount > 0 && (
+                    <div className="-right-1 -top-1 absolute flex h-6 w-6 items-center justify-center rounded-full border-2 border-slate-800 bg-red-500">
+                      <span className="font-bold text-white text-xs">{unreadCount > 9 ? "9+" : unreadCount}</span>
+                    </div>
+                  )}
+                </Button>
+              </div>
             </div>
           </DrawerTrigger>
           <DrawerContent className="flex h-[85vh] flex-col border-slate-700 bg-slate-900">

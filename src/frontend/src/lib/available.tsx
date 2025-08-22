@@ -76,7 +76,7 @@ export function Available({ user }: AvailableProps) {
               <span className="font-bold text-purple-400 text-xs">2</span>
             </div>
             <div>
-              <p className="font-medium text-slate-300 text-sm">Listen carefully</p>
+              <p className="font-medium text-slate-300 text-sm">Listen to your partner carefully</p>
               <p className="text-slate-400 text-xs">You'll answer questions about your partner</p>
             </div>
           </div>

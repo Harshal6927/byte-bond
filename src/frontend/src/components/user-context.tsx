@@ -60,7 +60,7 @@ export function UserProvider({ children }: UserProviderProps) {
     const response = await apiAuthLoginLogin({ body: userData })
 
     if (response.status === 201) {
-      window.location.href = "/"
+      navigate({ to: "/", replace: true })
     } else {
       toast.error("Login failed", {
         description: response.error?.detail,

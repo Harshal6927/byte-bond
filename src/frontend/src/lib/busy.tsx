@@ -234,7 +234,7 @@ export function Busy({ gameStatus: initialGameStatus }: BusyProps) {
         <Card className="border-slate-700/50 bg-slate-800/50 p-6 backdrop-blur-sm">
           <h3 className="flex items-center gap-2 font-semibold text-lg text-slate-200">
             <Trophy className="h-5 w-5 text-yellow-400" />
-            Your Questions
+            Ask your partner...
           </h3>
           <div className="space-y-4">
             {gameStatus.connection_questions.map((question, index) => {
