@@ -203,12 +203,30 @@ function DashboardPage() {
   // Render status-specific component
   if (gameStatus && user) {
     return (
-      <div className="min-h-[calc(100vh-4rem)]">
-        <div className="mx-auto max-w-md">
+      <div className="flex min-h-[calc(100vh-4rem)] flex-col">
+        <div className="mx-auto max-w-md flex-1">
           {gameStatus.user_status === "available" && <Available user={user} />}
           {gameStatus.user_status === "connecting" && <Connecting gameStatus={gameStatus} user={user} />}
           {gameStatus.user_status === "busy" && <Busy gameStatus={gameStatus} />}
         </div>
+
+        {/* Footer */}
+        <footer className="mt-auto px-4 pb-4">
+          <div className="space-y-2 text-center text-slate-500 text-xs">
+            <div>
+              <a href="https://www.harshallaheri.me/" target="_blank" rel="noopener noreferrer">
+                Built by <span className="font-medium text-purple-400">Harshal</span>
+              </a>
+            </div>
+            <div>
+              <a href="https://litestar.dev/" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center gap-1">
+                <span>Powered by</span>
+                <img src="/litestar.svg" width="25" height="25" alt="Litestar logo" className="inline-block" />
+                <span className="font-medium text-[#edb641]">Litestar</span>
+              </a>
+            </div>
+          </div>
+        </footer>
 
         {/* Cancellation Dialog */}
         <Dialog open={showCancellationDialog} onOpenChange={setShowCancellationDialog}>
