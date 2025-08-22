@@ -427,7 +427,7 @@ export function Connecting({ gameStatus, user }: ConnectingProps) {
       </Button> */}
 
       {/* Floating Chat Button - Only show if we have a partner */}
-      {!gameStatus.partner_name && (
+      {gameStatus.partner_name && (
         <Drawer open={isChatOpen} onOpenChange={setIsChatOpen}>
           <DrawerTrigger asChild>
             <div className="fixed right-4 bottom-4 z-50">
