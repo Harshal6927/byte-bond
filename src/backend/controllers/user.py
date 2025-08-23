@@ -14,7 +14,7 @@ from src.backend.lib.dependencies import (
 )
 from src.backend.lib.services import EventService, QuestionService, UserAnswerService, UserService
 from src.backend.lib.utils import admin_user_guard
-from src.backend.models import User
+from src.backend.models import Question, User
 from src.backend.schema.user import GetUser, PatchUser, PostUser
 
 
@@ -38,24 +38,26 @@ class UserController(Controller):
         user_answer_service: UserAnswerService,
     ) -> GetUser:
         event = await event_service.get_one(code=data.event_code)
-
         whitelist = event.whitelist.get("emails", [])
 
         if data.email not in whitelist:
             raise PermissionDeniedException("Your email is not whitelisted for this event.")
 
-        signup_questions = await question_service.list()
-        signup_questions_ids = {question.id for question in signup_questions}
-
         user_answers_questions_ids = [answer.question_id for answer in data.user_answer]
-        user_answers_questions_set = set(user_answers_questions_ids)
+        user_answers_questions_ids_set = set(user_answers_questions_ids)
 
         # Validate that all answered questions are unique (no duplicates)
-        if len(user_answers_questions_set) != len(user_answers_questions_ids):
+        if len(user_answers_questions_ids_set) != len(user_answers_questions_ids):
             raise PermissionDeniedException("You cannot answer the same question twice.")
 
+        signup_questions = await question_service.list(
+            Question.id.in_(user_answers_questions_ids_set),
+            Question.is_signup_question.is_(True),
+        )
+        signup_questions_ids = {question.id for question in signup_questions}
+
         # Validate that all answered questions exist in the database
-        if not user_answers_questions_set.issubset(signup_questions_ids):
+        if not user_answers_questions_ids_set.issubset(signup_questions_ids):
             raise PermissionDeniedException("Some of the answered questions do not exist.")
 
         user = await user_service.create(
