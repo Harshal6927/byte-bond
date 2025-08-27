@@ -26,8 +26,9 @@ export const apiAuthMeGetUser = <ThrowOnError extends boolean = false>(options?:
         responseType: 'json',
         security: [
             {
-                scheme: 'bearer',
-                type: 'http'
+                in: 'cookie',
+                name: 'session',
+                type: 'apiKey'
             }
         ],
         url: '/api/auth/me',
@@ -43,8 +44,9 @@ export const apiAuthLoginLogin = <ThrowOnError extends boolean = false>(options:
         responseType: 'json',
         security: [
             {
-                scheme: 'bearer',
-                type: 'http'
+                in: 'cookie',
+                name: 'session',
+                type: 'apiKey'
             }
         ],
         url: '/api/auth/login',
@@ -64,8 +66,9 @@ export const apiAuthLogoutLogout = <ThrowOnError extends boolean = false>(option
         responseType: 'json',
         security: [
             {
-                scheme: 'bearer',
-                type: 'http'
+                in: 'cookie',
+                name: 'session',
+                type: 'apiKey'
             }
         ],
         url: '/api/auth/logout',
@@ -81,8 +84,9 @@ export const apiEventsEventIdDeleteEvent = <ThrowOnError extends boolean = false
         responseType: 'json',
         security: [
             {
-                scheme: 'bearer',
-                type: 'http'
+                in: 'cookie',
+                name: 'session',
+                type: 'apiKey'
             }
         ],
         url: '/api/events/{event_id}',
@@ -98,8 +102,9 @@ export const apiEventsEventIdGetEvent = <ThrowOnError extends boolean = false>(o
         responseType: 'json',
         security: [
             {
-                scheme: 'bearer',
-                type: 'http'
+                in: 'cookie',
+                name: 'session',
+                type: 'apiKey'
             }
         ],
         url: '/api/events/{event_id}',
@@ -115,8 +120,9 @@ export const apiEventsEventIdPatchEvent = <ThrowOnError extends boolean = false>
         responseType: 'json',
         security: [
             {
-                scheme: 'bearer',
-                type: 'http'
+                in: 'cookie',
+                name: 'session',
+                type: 'apiKey'
             }
         ],
         url: '/api/events/{event_id}',
@@ -136,8 +142,9 @@ export const apiEventsGetEvents = <ThrowOnError extends boolean = false>(options
         responseType: 'json',
         security: [
             {
-                scheme: 'bearer',
-                type: 'http'
+                in: 'cookie',
+                name: 'session',
+                type: 'apiKey'
             }
         ],
         url: '/api/events',
@@ -153,8 +160,9 @@ export const apiEventsPostEvent = <ThrowOnError extends boolean = false>(options
         responseType: 'json',
         security: [
             {
-                scheme: 'bearer',
-                type: 'http'
+                in: 'cookie',
+                name: 'session',
+                type: 'apiKey'
             }
         ],
         url: '/api/events',
@@ -174,8 +182,9 @@ export const apiGameAnswerQuestionAnswerQuestion = <ThrowOnError extends boolean
         responseType: 'json',
         security: [
             {
-                scheme: 'bearer',
-                type: 'http'
+                in: 'cookie',
+                name: 'session',
+                type: 'apiKey'
             }
         ],
         url: '/api/game/answer-question',
@@ -194,8 +203,9 @@ export const apiGameCancelConnectionCancelConnection = <ThrowOnError extends boo
     return (options?.client ?? _heyApiClient).post<ApiGameCancelConnectionCancelConnectionResponses, unknown, ThrowOnError>({
         security: [
             {
-                scheme: 'bearer',
-                type: 'http'
+                in: 'cookie',
+                name: 'session',
+                type: 'apiKey'
             }
         ],
         url: '/api/game/cancel-connection',
@@ -210,8 +220,9 @@ export const apiGameChatChat = <ThrowOnError extends boolean = false>(options: O
     return (options.client ?? _heyApiClient).post<ApiGameChatChatResponses, ApiGameChatChatErrors, ThrowOnError>({
         security: [
             {
-                scheme: 'bearer',
-                type: 'http'
+                in: 'cookie',
+                name: 'session',
+                type: 'apiKey'
             }
         ],
         url: '/api/game/chat',
@@ -230,8 +241,9 @@ export const apiGameCompleteConnectionCompleteConnection = <ThrowOnError extends
     return (options?.client ?? _heyApiClient).post<ApiGameCompleteConnectionCompleteConnectionResponses, unknown, ThrowOnError>({
         security: [
             {
-                scheme: 'bearer',
-                type: 'http'
+                in: 'cookie',
+                name: 'session',
+                type: 'apiKey'
             }
         ],
         url: '/api/game/complete-connection',
@@ -247,8 +259,9 @@ export const apiGameStatusGetGameStatus = <ThrowOnError extends boolean = false>
         responseType: 'json',
         security: [
             {
-                scheme: 'bearer',
-                type: 'http'
+                in: 'cookie',
+                name: 'session',
+                type: 'apiKey'
             }
         ],
         url: '/api/game/status',
@@ -264,8 +277,9 @@ export const apiGameLeaderboardEventIdGetLeaderboard = <ThrowOnError extends boo
         responseType: 'json',
         security: [
             {
-                scheme: 'bearer',
-                type: 'http'
+                in: 'cookie',
+                name: 'session',
+                type: 'apiKey'
             }
         ],
         url: '/api/game/leaderboard/{event_id}',
@@ -280,8 +294,9 @@ export const apiGameScanQrScanQrCode = <ThrowOnError extends boolean = false>(op
     return (options.client ?? _heyApiClient).post<ApiGameScanQrScanQrCodeResponses, ApiGameScanQrScanQrCodeErrors, ThrowOnError>({
         security: [
             {
-                scheme: 'bearer',
-                type: 'http'
+                in: 'cookie',
+                name: 'session',
+                type: 'apiKey'
             }
         ],
         url: '/api/game/scan-qr',
@@ -301,8 +316,9 @@ export const apiGameStartStartGame = <ThrowOnError extends boolean = false>(opti
         responseType: 'json',
         security: [
             {
-                scheme: 'bearer',
-                type: 'http'
+                in: 'cookie',
+                name: 'session',
+                type: 'apiKey'
             }
         ],
         url: '/api/game/start',
@@ -322,8 +338,9 @@ export const apiGameStopStopGame = <ThrowOnError extends boolean = false>(option
         responseType: 'json',
         security: [
             {
-                scheme: 'bearer',
-                type: 'http'
+                in: 'cookie',
+                name: 'session',
+                type: 'apiKey'
             }
         ],
         url: '/api/game/stop',
@@ -343,8 +360,9 @@ export const apiQuestionsQuestionIdDeleteQuestion = <ThrowOnError extends boolea
         responseType: 'json',
         security: [
             {
-                scheme: 'bearer',
-                type: 'http'
+                in: 'cookie',
+                name: 'session',
+                type: 'apiKey'
             }
         ],
         url: '/api/questions/{question_id}',
@@ -360,8 +378,9 @@ export const apiQuestionsQuestionIdGetQuestion = <ThrowOnError extends boolean =
         responseType: 'json',
         security: [
             {
-                scheme: 'bearer',
-                type: 'http'
+                in: 'cookie',
+                name: 'session',
+                type: 'apiKey'
             }
         ],
         url: '/api/questions/{question_id}',
@@ -377,8 +396,9 @@ export const apiQuestionsQuestionIdPatchQuestion = <ThrowOnError extends boolean
         responseType: 'json',
         security: [
             {
-                scheme: 'bearer',
-                type: 'http'
+                in: 'cookie',
+                name: 'session',
+                type: 'apiKey'
             }
         ],
         url: '/api/questions/{question_id}',
@@ -398,8 +418,9 @@ export const apiQuestionsGetQuestions = <ThrowOnError extends boolean = false>(o
         responseType: 'json',
         security: [
             {
-                scheme: 'bearer',
-                type: 'http'
+                in: 'cookie',
+                name: 'session',
+                type: 'apiKey'
             }
         ],
         url: '/api/questions',
@@ -415,8 +436,9 @@ export const apiQuestionsPostQuestion = <ThrowOnError extends boolean = false>(o
         responseType: 'json',
         security: [
             {
-                scheme: 'bearer',
-                type: 'http'
+                in: 'cookie',
+                name: 'session',
+                type: 'apiKey'
             }
         ],
         url: '/api/questions',
@@ -436,8 +458,9 @@ export const apiUsersUserIdDeleteUser = <ThrowOnError extends boolean = false>(o
         responseType: 'json',
         security: [
             {
-                scheme: 'bearer',
-                type: 'http'
+                in: 'cookie',
+                name: 'session',
+                type: 'apiKey'
             }
         ],
         url: '/api/users/{user_id}',
@@ -453,8 +476,9 @@ export const apiUsersUserIdGetUser = <ThrowOnError extends boolean = false>(opti
         responseType: 'json',
         security: [
             {
-                scheme: 'bearer',
-                type: 'http'
+                in: 'cookie',
+                name: 'session',
+                type: 'apiKey'
             }
         ],
         url: '/api/users/{user_id}',
@@ -470,8 +494,9 @@ export const apiUsersUserIdPatchUser = <ThrowOnError extends boolean = false>(op
         responseType: 'json',
         security: [
             {
-                scheme: 'bearer',
-                type: 'http'
+                in: 'cookie',
+                name: 'session',
+                type: 'apiKey'
             }
         ],
         url: '/api/users/{user_id}',
@@ -491,8 +516,9 @@ export const apiUsersGetUsers = <ThrowOnError extends boolean = false>(options?:
         responseType: 'json',
         security: [
             {
-                scheme: 'bearer',
-                type: 'http'
+                in: 'cookie',
+                name: 'session',
+                type: 'apiKey'
             }
         ],
         url: '/api/users',
@@ -508,8 +534,9 @@ export const apiUsersPostUser = <ThrowOnError extends boolean = false>(options: 
         responseType: 'json',
         security: [
             {
-                scheme: 'bearer',
-                type: 'http'
+                in: 'cookie',
+                name: 'session',
+                type: 'apiKey'
             }
         ],
         url: '/api/users',
@@ -529,8 +556,9 @@ export const apiUserAnswersUserAnswerIdDeleteUserAnswer = <ThrowOnError extends 
         responseType: 'json',
         security: [
             {
-                scheme: 'bearer',
-                type: 'http'
+                in: 'cookie',
+                name: 'session',
+                type: 'apiKey'
             }
         ],
         url: '/api/user-answers/{user_answer_id}',
@@ -546,8 +574,9 @@ export const apiUserAnswersUserAnswerIdGetUserAnswer = <ThrowOnError extends boo
         responseType: 'json',
         security: [
             {
-                scheme: 'bearer',
-                type: 'http'
+                in: 'cookie',
+                name: 'session',
+                type: 'apiKey'
             }
         ],
         url: '/api/user-answers/{user_answer_id}',
@@ -563,8 +592,9 @@ export const apiUserAnswersUserAnswerIdPatchUserAnswer = <ThrowOnError extends b
         responseType: 'json',
         security: [
             {
-                scheme: 'bearer',
-                type: 'http'
+                in: 'cookie',
+                name: 'session',
+                type: 'apiKey'
             }
         ],
         url: '/api/user-answers/{user_answer_id}',
@@ -584,8 +614,9 @@ export const apiUserAnswersAllGetAllUserAnswers = <ThrowOnError extends boolean 
         responseType: 'json',
         security: [
             {
-                scheme: 'bearer',
-                type: 'http'
+                in: 'cookie',
+                name: 'session',
+                type: 'apiKey'
             }
         ],
         url: '/api/user-answers/all',
@@ -601,8 +632,9 @@ export const apiUserAnswersGetUserAnswers = <ThrowOnError extends boolean = fals
         responseType: 'json',
         security: [
             {
-                scheme: 'bearer',
-                type: 'http'
+                in: 'cookie',
+                name: 'session',
+                type: 'apiKey'
             }
         ],
         url: '/api/user-answers',
@@ -618,8 +650,9 @@ export const apiUserAnswersPostUserAnswer = <ThrowOnError extends boolean = fals
         responseType: 'json',
         security: [
             {
-                scheme: 'bearer',
-                type: 'http'
+                in: 'cookie',
+                name: 'session',
+                type: 'apiKey'
             }
         ],
         url: '/api/user-answers',

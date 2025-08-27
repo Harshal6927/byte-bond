@@ -38,8 +38,8 @@ class Settings:
     db_connection_string: str | None = field(
         default_factory=lambda: os.getenv("DB_CONNECTION_STRING"),
     )
-    secret_key: str | None = field(
-        default_factory=lambda: os.getenv("SECRET_KEY"),
+    vakley_port: int = field(
+        default_factory=lambda: int(os.getenv("VALKEY_PORT", "6379")),
     )
     vite: ViteSettings = field(default_factory=ViteSettings)
 

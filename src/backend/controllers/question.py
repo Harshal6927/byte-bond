@@ -50,7 +50,7 @@ class QuestionController(Controller):
             )
         return question_service.to_schema(questions, schema_type=GetQuestion)
 
-    @get("/{question_id:int}", exclude_from_auth=True)
+    @get("/{question_id:int}", guards=[admin_user_guard])
     async def get_question(
         self,
         question_id: int,

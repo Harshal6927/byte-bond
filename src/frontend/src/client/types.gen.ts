@@ -278,9 +278,7 @@ export type ApiAuthLoginLoginResponses = {
     /**
      * Document created, URL follows
      */
-    201: {
-        [key: string]: unknown;
-    };
+    201: GetUser;
 };
 
 export type ApiAuthLoginLoginResponse = ApiAuthLoginLoginResponses[keyof ApiAuthLoginLoginResponses];

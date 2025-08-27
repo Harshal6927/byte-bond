@@ -20,6 +20,11 @@ repos:
         exclude: ^migrations/
       - id: trailing-whitespace
         exclude: ^migrations/
+  - repo: https://github.com/compilerla/conventional-pre-commit
+    rev: v4.0.0
+    hooks:
+      - id: conventional-pre-commit
+        stages: [commit-msg]
   - repo: https://github.com/charliermarsh/ruff-pre-commit
     rev: v0.11.10
     hooks:
