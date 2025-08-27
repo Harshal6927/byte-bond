@@ -57,7 +57,7 @@
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object"
+                                    "$ref": "#/components/schemas/GetUser"
                                 }
                             }
                         }
@@ -2704,19 +2704,17 @@
             }
         },
         "securitySchemes": {
-            "BearerToken": {
-                "type": "http",
-                "description": "JWT cookie-based authentication and authorization.",
-                "name": "token",
-                "in": "cookie",
-                "scheme": "Bearer",
-                "bearerFormat": "JWT"
+            "sessionCookie": {
+                "type": "apiKey",
+                "description": "Session cookie authentication.",
+                "name": "session",
+                "in": "cookie"
             }
         }
     },
     "security": [
         {
-            "BearerToken": []
+            "sessionCookie": []
         }
     ]
 }

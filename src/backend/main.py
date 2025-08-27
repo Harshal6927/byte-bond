@@ -10,9 +10,10 @@ from src.backend.config import (
     admin_plugin,
     alchemy_plugin,
     channels_plugin,
-    jwt_cookie_auth,
     saq_plugin,
     settings,
+    sss_auth,
+    valkey_config,
     vite_plugin,
 )
 from src.backend.controllers.auth import AuthController
@@ -44,7 +45,7 @@ app = Litestar(
         vite_plugin,
         CLIPlugin(),
     ],
-    on_app_init=[jwt_cookie_auth.on_app_init],
+    on_app_init=[sss_auth.on_app_init],
     openapi_config=OpenAPIConfig(
         title="Byte Bond",
         version="dev",
@@ -72,4 +73,5 @@ app = Litestar(
         RepositoryError: exception_handler,
     },
     middleware=[configure_instrumentation().middleware],
+    stores={"sessions": valkey_config},
 )

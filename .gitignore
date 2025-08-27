@@ -21,8 +21,6 @@ dist-ssr
 *.local
 
 # Editor directories and files
-.vscode/*
-!.vscode/extensions.json
 .idea
 .DS_Store
 *.suo
@@ -34,7 +32,6 @@ dist-ssr
 .venv
 .env
 .env.prod
-.vscode
 test_storage/
 test.sqlite
 .tanstack

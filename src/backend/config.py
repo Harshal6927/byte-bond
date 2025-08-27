@@ -1,18 +1,21 @@
-from datetime import timedelta
 from typing import Any
 
 from litestar.channels import ChannelsPlugin
 from litestar.channels.backends.memory import MemoryChannelsBackend
 from litestar.connection import ASGIConnection
+from litestar.middleware.session.base import ONE_DAY_IN_SECONDS
+from litestar.middleware.session.server_side import ServerSideSessionBackend, ServerSideSessionConfig
 from litestar.plugins.sqlalchemy import (
     AsyncSessionConfig,
     SQLAlchemyAsyncConfig,
     SQLAlchemyPlugin,
 )
-from litestar.security.jwt import JWTCookieAuth, Token
+from litestar.security.session_auth import SessionAuth
+from litestar.stores.valkey import ValkeyStore
 from litestar_saq import CronJob, QueueConfig, SAQConfig, SAQPlugin
 from litestar_vite import ViteConfig, VitePlugin
 from sqladmin_litestar_plugin import SQLAdminPlugin
+from valkey.asyncio import Valkey
 
 from src.backend.lib.admin import (
     ConnectionAdminView,
@@ -47,15 +50,16 @@ channels_plugin = ChannelsPlugin(
 
 # Auth
 async def _retrieve_user_handler(
-    token: Token,
+    session: dict[str, Any],
     connection: ASGIConnection[Any, Any, Any, Any],
 ) -> User | None:
+    if not (user_id := session.get("user_id")):
+        return None
+
     async with sqlalchemy_config.get_session() as db_session:
         users_service = await anext(provide_user_service(db_session))
 
-        user = await users_service.get_one_or_none(
-            id=int(token.sub),
-        )
+        user = await users_service.get_one_or_none(id=int(user_id))
 
         if not user:
             return None
@@ -67,13 +71,14 @@ async def _retrieve_user_handler(
         return user
 
 
-jwt_cookie_auth = JWTCookieAuth[User](
+sss_auth = SessionAuth[User, ServerSideSessionBackend](
     retrieve_user_handler=_retrieve_user_handler,
-    token_secret=settings.secret_key or "supersecretkey",
-    default_token_expiration=timedelta(days=1),
+    session_backend_config=ServerSideSessionConfig(
+        samesite="strict",
+        secure=not settings.debug,
+        max_age=ONE_DAY_IN_SECONDS,
+    ),
     exclude=["/schema", "/saq"],
-    samesite="strict",
-    secure=not settings.debug,
 )
 
 
@@ -131,3 +136,6 @@ admin_plugin = SQLAdminPlugin(
     ],
     engine=sqlalchemy_config.get_engine(),
 )
+
+# Vakey
+valkey_config = ValkeyStore(Valkey(port=settings.vakley_port))

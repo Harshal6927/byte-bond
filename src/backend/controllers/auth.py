@@ -2,10 +2,8 @@ from typing import Any
 
 from litestar import Request, Response, get, post
 from litestar.controller import Controller
-from litestar.datastructures import Cookie
 from litestar.di import Provide
 
-from src.backend.config import jwt_cookie_auth
 from src.backend.lib.dependencies import provide_event_service, provide_user_service
 from src.backend.lib.services import EventService, UserService
 from src.backend.models import User
@@ -27,7 +25,8 @@ class AuthController(Controller):
         data: PostLogin,
         users_service: UserService,
         event_service: EventService,
-    ) -> Response:
+        request: Request[User, Any, Any],
+    ) -> GetUser:
         event = await event_service.get_one_or_none(code=data.event_code)
 
         user = await users_service.get_one(
@@ -35,17 +34,13 @@ class AuthController(Controller):
             event_id=event.id if event else None,
         )
 
-        return jwt_cookie_auth.login(
-            identifier=str(user.id),
-            send_token_as_response_body=True,
-        )
+        request.set_session({"user_id": user.id})
+        return users_service.to_schema(user, schema_type=GetUser)
 
-    @get("/logout", exclude_from_auth=True)
-    async def logout(self) -> Response:
-        return Response(
-            content=None,
-            cookies=[Cookie(key="token", value=None, expires=0)],
-        )
+    @get("/logout")
+    async def logout(self, request: Request[User, Any, Any]) -> Response:
+        request.set_session({"user_id": None})
+        return Response(content=None)
 
     @get("/me")
     async def get_user(
