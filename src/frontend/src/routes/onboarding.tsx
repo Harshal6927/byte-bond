@@ -1,8 +1,10 @@
 import { type GetQuestion, type PostUserAnswer, apiQuestionsGetQuestions, apiUsersPostUser } from "@/client"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useUser } from "@/components/user-context"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -26,7 +28,8 @@ const registrationSchema = z.object({
 type RegistrationFormData = z.infer<typeof registrationSchema>
 
 const answerSchema = z.object({
-  answer: z.string().min(1, "Answer is required").max(25, "Answer must be 25 characters or less"),
+  answer: z.string().optional(),
+  selectedOptions: z.array(z.string()).optional(),
 })
 
 type AnswerFormData = z.infer<typeof answerSchema>
@@ -38,6 +41,7 @@ export default function OnboardingPage() {
   const [isLoadingQuestions, setIsLoadingQuestions] = useState(true)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [step, setStep] = useState<"questions" | "registration">("questions")
+  const [selectedOptions, setSelectedOptions] = useState<string[]>([])
 
   const { login } = useUser()
 
@@ -45,6 +49,7 @@ export default function OnboardingPage() {
     resolver: zodResolver(answerSchema),
     defaultValues: {
       answer: "",
+      selectedOptions: [],
     },
     mode: "onBlur",
   })
@@ -95,13 +100,62 @@ export default function OnboardingPage() {
     loadQuestions()
   }, [])
 
+  // Handle loading previous answers when question changes
+  useEffect(() => {
+    if (questions.length > 0 && currentQuestionIndex >= 0) {
+      const currentQuestion = questions[currentQuestionIndex]
+      const existingAnswer = answers.find((a) => a.question_id === currentQuestion.id)
+
+      if (existingAnswer) {
+        if (currentQuestion.question_type === "default") {
+          answerForm.reset({ answer: existingAnswer.answer || "", selectedOptions: [] })
+          setSelectedOptions([])
+        } else if (currentQuestion.question_type === "multiple_choice" || currentQuestion.question_type === "true_false") {
+          const selectedOptionsList = existingAnswer.answer ? existingAnswer.answer.split(" ::: ") : []
+          answerForm.reset({ answer: "", selectedOptions: selectedOptionsList })
+          setSelectedOptions(selectedOptionsList)
+        }
+      } else {
+        answerForm.reset({ answer: "", selectedOptions: [] })
+        setSelectedOptions([])
+      }
+    }
+  }, [currentQuestionIndex, questions, answers, answerForm])
+
   const handleAnswerSubmit = (data: AnswerFormData) => {
     const currentQuestion = questions[currentQuestionIndex]
+
+    let answerValue = ""
+
+    // Determine the answer based on question type
+    if (currentQuestion.question_type === "default") {
+      answerValue = data.answer?.trim() || ""
+
+      // Validate that an answer is provided for default questions
+      if (answerValue === "") {
+        toast.error("Please provide an answer")
+        return
+      }
+
+      // Validate answer length for default questions
+      if (answerValue.length > 25) {
+        toast.error("Answer must be 25 characters or less")
+        return
+      }
+    } else if (currentQuestion.question_type === "multiple_choice" || currentQuestion.question_type === "true_false") {
+      answerValue = selectedOptions.join(" ::: ")
+
+      // Validate that at least one option is selected for MCQ/T-F questions
+      if (answerValue === "") {
+        toast.error("Please select at least one option")
+        return
+      }
+    }
 
     // Save the answer
     const newAnswer: PostUserAnswer = {
       question_id: currentQuestion.id,
-      answer: data.answer.trim(),
+      answer: answerValue,
     }
 
     setAnswers((prev) => {
@@ -117,7 +171,8 @@ export default function OnboardingPage() {
     // Move to next question or registration
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex((prev) => prev + 1)
-      answerForm.reset({ answer: "" })
+      answerForm.reset({ answer: "", selectedOptions: [] })
+      setSelectedOptions([])
     } else {
       setStep("registration")
     }
@@ -129,8 +184,31 @@ export default function OnboardingPage() {
       // Load previous answer if exists
       const previousQuestion = questions[currentQuestionIndex - 1]
       const previousAnswer = answers.find((a) => a.question_id === previousQuestion.id)
-      answerForm.reset({ answer: previousAnswer?.answer || "" })
+
+      if (previousAnswer) {
+        if (previousQuestion.question_type === "default") {
+          answerForm.reset({ answer: previousAnswer.answer || "", selectedOptions: [] })
+          setSelectedOptions([])
+        } else if (previousQuestion.question_type === "multiple_choice" || previousQuestion.question_type === "true_false") {
+          const previousSelectedOptions = previousAnswer.answer ? previousAnswer.answer.split(" ::: ") : []
+          answerForm.reset({ answer: "", selectedOptions: previousSelectedOptions })
+          setSelectedOptions(previousSelectedOptions)
+        }
+      } else {
+        answerForm.reset({ answer: "", selectedOptions: [] })
+        setSelectedOptions([])
+      }
     }
+  }
+
+  const handleOptionToggle = (option: string) => {
+    setSelectedOptions((prev) => {
+      const newSelected = prev.includes(option) ? prev.filter((o) => o !== option) : [...prev, option]
+
+      // Update form state
+      answerForm.setValue("selectedOptions", newSelected)
+      return newSelected
+    })
   }
 
   const handleRegistration = async (data: RegistrationFormData) => {
@@ -197,24 +275,45 @@ export default function OnboardingPage() {
                   <div className="space-y-4">
                     <h3 className="font-semibold text-lg text-slate-200">{currentQuestion.question}</h3>
 
-                    <FormField
-                      control={answerForm.control}
-                      name="answer"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel className="text-slate-300 text-sm">Your Answer</FormLabel>
-                          <FormControl>
-                            <Input
-                              {...field}
-                              placeholder="Type your answer here..."
-                              disabled={isSubmitting}
-                              className="h-12 border-slate-600 bg-slate-800/50 text-white placeholder:text-slate-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
-                            />
-                          </FormControl>
-                          <FormMessage className="text-red-400 text-xs" />
-                        </FormItem>
-                      )}
-                    />
+                    {currentQuestion.question_type === "default" ? (
+                      <FormField
+                        control={answerForm.control}
+                        name="answer"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel className="text-slate-300 text-sm">Your Answer</FormLabel>
+                            <FormControl>
+                              <Input
+                                {...field}
+                                placeholder="Type your answer here..."
+                                disabled={isSubmitting}
+                                className="h-12 border-slate-600 bg-slate-800/50 text-white placeholder:text-slate-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
+                              />
+                            </FormControl>
+                            <FormMessage className="text-red-400 text-xs" />
+                          </FormItem>
+                        )}
+                      />
+                    ) : (
+                      <div className="space-y-3">
+                        <FormLabel className="text-slate-300 text-sm">Select your answer(s)</FormLabel>
+                        <div className="space-y-3">
+                          {currentQuestion.options?.map((option) => (
+                            <div key={option} className="flex items-center space-x-3">
+                              <Checkbox
+                                id={`option-${option}`}
+                                checked={selectedOptions.includes(option)}
+                                onCheckedChange={() => handleOptionToggle(option)}
+                                className="data-[state=checked]:border-purple-500 data-[state=checked]:bg-purple-500"
+                              />
+                              <Label htmlFor={`option-${option}`} className="flex-1 cursor-pointer font-medium text-slate-200 text-sm">
+                                {option}
+                              </Label>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex gap-3">
