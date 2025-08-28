@@ -24,7 +24,15 @@ from src.backend.lib.services import (
     UserService,
 )
 from src.backend.lib.utils import admin_user_guard, publish_to_channel
-from src.backend.models import Connection, ConnectionQuestion, ConnectionStatus, Question, User, UserStatus
+from src.backend.models import (
+    Connection,
+    ConnectionQuestion,
+    ConnectionStatus,
+    Question,
+    QuestionType,
+    User,
+    UserStatus,
+)
 from src.backend.schema.event import GetEvent
 from src.backend.schema.game import (
     ConnectionQuestionData,
@@ -316,11 +324,11 @@ class GameController(Controller):
 
         if not other_user_answer:
             raise ClientException(
-                detail="Other user hasn't answered this question during signup",
+                detail="Your partner hasn't answered this question during signup",
             )
 
         # Check if answer is correct (case-insensitive comparison)
-        is_correct = data.answer.lower().strip() == other_user_answer.lower().strip()
+        is_correct = data.answer.lower().strip().replace(" ", "") == other_user_answer.lower().strip().replace(" ", "")
 
         # Update the connection question
         await connection_question_service.update(
@@ -342,8 +350,8 @@ class GameController(Controller):
 
         return QuestionResult(
             correct=is_correct,
-            expected_answer=other_user_answer,
-            your_answer=data.answer,
+            expected_answer=other_user_answer.replace(" ::: ", ", "),
+            your_answer=data.answer.replace(" ::: ", ", "),
         )
 
     @post("/complete-connection")
@@ -549,14 +557,24 @@ class GameController(Controller):
         question_ids = [cq.question_id for cq in user_connection_questions]
         questions = await question_service.list(Question.id.in_(question_ids))
 
-        # Create a mapping of question_id to question text
-        question_map = {q.id: q.question for q in questions}
+        # Create a mapping of question_id to question details
+        question_map = {q.id: q for q in questions}
 
         return [
             ConnectionQuestionData(
                 id=cq.id,
                 question_id=cq.question_id,
-                question_text=question_map.get(cq.question_id, "Error: Unknown Question"),
+                question_text=(
+                    question_map[cq.question_id].question
+                    if cq.question_id in question_map
+                    else "Error: Unknown Question"
+                ),
+                question_type=(
+                    question_map[cq.question_id].question_type
+                    if cq.question_id in question_map
+                    else QuestionType.DEFAULT
+                ),
+                options=(question_map[cq.question_id].options if cq.question_id in question_map else None),
                 question_answered=cq.question_answered,
                 answered_correctly=cq.answered_correctly,
             )

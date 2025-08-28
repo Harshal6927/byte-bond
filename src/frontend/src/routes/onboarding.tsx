@@ -298,8 +298,9 @@ export default function OnboardingPage() {
                       <div className="space-y-3">
                         <FormLabel className="text-slate-300 text-sm">Select your answer(s)</FormLabel>
                         <div className="space-y-3">
-                          {currentQuestion.options?.map((option) => (
-                            <div key={option} className="flex items-center space-x-3">
+                          {currentQuestion.options?.map((option, index) => (
+                            // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+                            <div key={index} className="flex items-center space-x-3">
                               <Checkbox
                                 id={`option-${option}`}
                                 checked={selectedOptions.includes(option)}

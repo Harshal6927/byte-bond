@@ -8,8 +8,10 @@ import {
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
+import { Checkbox } from "@/components/ui/checkbox"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { CheckCircle, Clock, MessageCircle, Timer, Trophy, Users, X, XCircle } from "lucide-react"
 import { useEffect, useState } from "react"
 import { toast } from "sonner"
@@ -29,6 +31,7 @@ export function Busy({ gameStatus: initialGameStatus }: BusyProps) {
 
   // Answer state
   const [answers, setAnswers] = useState<Record<number, string>>({})
+  const [selectedOptions, setSelectedOptions] = useState<Record<number, string[]>>({})
   const [isSubmitting, setIsSubmitting] = useState<Record<number, boolean>>({})
   const [questionResults, setQuestionResults] = useState<Record<number, QuestionResult>>({})
   const [cooldownEnd, setCooldownEnd] = useState<number | null>(null)
@@ -61,11 +64,41 @@ export function Busy({ gameStatus: initialGameStatus }: BusyProps) {
     setAnswers((prev) => ({ ...prev, [questionId]: value }))
   }
 
-  const handleSubmitAnswer = async (questionId: number) => {
-    const answer = answers[questionId]?.trim()
+  const handleOptionToggle = (questionId: number, option: string) => {
+    setSelectedOptions((prev) => {
+      const currentOptions = prev[questionId] || []
+      const newOptions = currentOptions.includes(option) ? currentOptions.filter((o) => o !== option) : [...currentOptions, option]
+      return { ...prev, [questionId]: newOptions }
+    })
+  }
 
-    if (!answer) {
-      toast.error("Please enter an answer")
+  const handleSubmitAnswer = async (questionId: number) => {
+    // Find the question to determine its type
+    const question = gameStatus.connection_questions?.find((q) => q.question_id === questionId)
+    if (!question) {
+      toast.error("Question not found")
+      return
+    }
+
+    let finalAnswer = ""
+
+    // Determine answer based on question type
+    if (question.question_type === "default") {
+      const answer = answers[questionId]?.trim()
+      if (!answer) {
+        toast.error("Please enter an answer")
+        return
+      }
+      finalAnswer = answer
+    } else if (question.question_type === "multiple_choice" || question.question_type === "true_false") {
+      const selectedOpts = selectedOptions[questionId] || []
+      if (selectedOpts.length === 0) {
+        toast.error("Please select at least one option")
+        return
+      }
+      finalAnswer = selectedOpts.join(" ::: ")
+    } else {
+      toast.error("Unknown question type")
       return
     }
 
@@ -74,7 +107,7 @@ export function Busy({ gameStatus: initialGameStatus }: BusyProps) {
     const response = await apiGameAnswerQuestionAnswerQuestion({
       body: {
         question_id: questionId,
-        answer: answer,
+        answer: finalAnswer,
       },
     })
 
@@ -101,8 +134,9 @@ export function Busy({ gameStatus: initialGameStatus }: BusyProps) {
 
       setGameStatus(updatedGameStatus)
 
-      // Clear the answer input
+      // Clear the answer input and selected options
       setAnswers((prev) => ({ ...prev, [questionId]: "" }))
+      setSelectedOptions((prev) => ({ ...prev, [questionId]: [] }))
 
       // Only start cooldown if there are still questions to answer
       const unansweredQuestions = updatedGameStatus.connection_questions?.filter((q) => !q.question_answered) || []
@@ -303,21 +337,49 @@ export function Busy({ gameStatus: initialGameStatus }: BusyProps) {
                   ) : (
                     // Show answer input for unanswered questions
                     <div className="space-y-3">
-                      <Input
-                        type="text"
-                        placeholder="Enter your answer..."
-                        value={answers[question.question_id] || ""}
-                        onChange={(e) => handleAnswerChange(question.question_id, e.target.value)}
-                        onKeyDown={(e) => handleKeyPress(e, question.question_id)}
-                        disabled={isCooldownActive || isSubmitting[question.question_id]}
-                        className="border-slate-600 bg-slate-800/50 text-white placeholder:text-slate-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
-                      />
+                      {question.question_type === "default" ? (
+                        // Text input for default questions
+                        <Input
+                          type="text"
+                          placeholder="Enter your answer..."
+                          value={answers[question.question_id] || ""}
+                          onChange={(e) => handleAnswerChange(question.question_id, e.target.value)}
+                          onKeyDown={(e) => handleKeyPress(e, question.question_id)}
+                          disabled={isCooldownActive || isSubmitting[question.question_id]}
+                          className="border-slate-600 bg-slate-800/50 text-white placeholder:text-slate-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20"
+                        />
+                      ) : (
+                        // Options for MCQ/True-False questions
+                        <div className="space-y-3">
+                          {question.options?.map((option, index) => (
+                            // biome-ignore lint/suspicious/noArrayIndexKey: <explanation>
+                            <div key={index} className="flex items-center space-x-3">
+                              <Checkbox
+                                id={`question-${question.question_id}-option-${option}`}
+                                checked={(selectedOptions[question.question_id] || []).includes(option)}
+                                onCheckedChange={() => handleOptionToggle(question.question_id, option)}
+                                disabled={isCooldownActive || isSubmitting[question.question_id]}
+                                className="data-[state=checked]:border-purple-500 data-[state=checked]:bg-purple-500"
+                              />
+                              <Label htmlFor={`question-${question.question_id}-option-${option}`} className="flex-1 cursor-pointer font-medium text-slate-200 text-sm">
+                                {option}
+                              </Label>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
                       <div className="flex items-center justify-between">
                         <span className="rounded-full bg-slate-600/50 px-3 py-1 font-medium text-slate-300 text-xs">Not answered</span>
                         <Button
                           size="sm"
                           onClick={() => handleSubmitAnswer(question.question_id)}
-                          disabled={!answers[question.question_id]?.trim() || isCooldownActive || isSubmitting[question.question_id]}
+                          disabled={
+                            (question.question_type === "default" && !answers[question.question_id]?.trim()) ||
+                            (question.question_type !== "default" && (!selectedOptions[question.question_id] || selectedOptions[question.question_id].length === 0)) ||
+                            isCooldownActive ||
+                            isSubmitting[question.question_id]
+                          }
                           className="bg-gradient-to-r from-purple-500 to-purple-700 text-white hover:from-purple-600 hover:to-purple-800 disabled:opacity-50"
                         >
                           {isSubmitting[question.question_id] ? "Submitting..." : "Submit Answer"}
