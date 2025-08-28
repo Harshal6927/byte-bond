@@ -2,7 +2,7 @@ from typing import Annotated
 
 from msgspec import Meta, Struct
 
-from src.backend.models import UserStatus
+from src.backend.models import QuestionType, UserStatus
 
 
 class GameStartRequest(Struct):
@@ -17,6 +17,8 @@ class ConnectionQuestionData(Struct):
     id: int
     question_id: int
     question_text: str
+    question_type: QuestionType
+    options: list[str] | None
     question_answered: bool
     answered_correctly: bool
 

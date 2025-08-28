@@ -7,6 +7,8 @@ export type ConnectionQuestionData = {
     id: number;
     question_id: number;
     question_text: string;
+    question_type: QuestionType;
+    options?: Array<string> | null;
     question_answered: boolean;
     answered_correctly: boolean;
 };

@@ -47,8 +47,8 @@ class Event(BigIntAuditBase):
     # ORM Relationships
     # -----------------
 
-    users: Mapped[list["User"]] = relationship(back_populates="event")
-    connections: Mapped[list["Connection"]] = relationship(back_populates="event")
+    users: Mapped[list["User"]] = relationship(back_populates="event", cascade="all, delete")
+    connections: Mapped[list["Connection"]] = relationship(back_populates="event", cascade="all, delete")
 
     def __repr__(self):
         return f"<Event(id={self.id}, name='{self.name}', code='{self.code}', active={self.is_active})>"
@@ -72,15 +72,18 @@ class User(BigIntAuditBase):
     connection_count: Mapped[int] = mapped_column(default=0)
     status: Mapped[UserStatus] = mapped_column(default=UserStatus.AVAILABLE)
     is_admin: Mapped[bool] = mapped_column(default=False)
-    event_id: Mapped[int | None] = mapped_column(ForeignKey("events.id", ondelete="CASCADE"), nullable=True)
+    event_id: Mapped[int | None] = mapped_column(ForeignKey("events.id", ondelete="CASCADE"))
 
     # -----------------
     # ORM Relationships
     # -----------------
 
     event: Mapped["Event"] = relationship(back_populates="users")
-    answers: Mapped[list["UserAnswer"]] = relationship(back_populates="user")
-    connection_questions: Mapped[list["ConnectionQuestion"]] = relationship(back_populates="user")
+    answers: Mapped[list["UserAnswer"]] = relationship(back_populates="user", cascade="all, delete")
+    connection_questions: Mapped[list["ConnectionQuestion"]] = relationship(
+        back_populates="user",
+        cascade="all, delete",
+    )
     # Relationships for `Connection` where this user is user1 (QR giver) or user2 (scanner)
     connections_as_user1: Mapped[list["Connection"]] = relationship(
         foreign_keys="[Connection.user1_id]",
@@ -109,12 +112,16 @@ class Question(BigIntAuditBase):
     options: Mapped[list[str] | None] = mapped_column(JsonB, default=None, nullable=True)  # For MCQs or True/False
     is_signup_question: Mapped[bool] = mapped_column(default=True)
     is_game_question: Mapped[bool] = mapped_column(default=True)
+
     # -----------------
     # ORM Relationships
     # -----------------
 
-    user_answers: Mapped[list["UserAnswer"]] = relationship(back_populates="question")
-    connection_questions: Mapped[list["ConnectionQuestion"]] = relationship(back_populates="question")
+    user_answers: Mapped[list["UserAnswer"]] = relationship(back_populates="question", cascade="all, delete")
+    connection_questions: Mapped[list["ConnectionQuestion"]] = relationship(
+        back_populates="question",
+        cascade="all, delete",
+    )
 
     def __repr__(self):
         return f"<Question(id={self.id}, question='{self.question}')>"
@@ -184,7 +191,10 @@ class Connection(BigIntAuditBase):
     event: Mapped["Event"] = relationship(back_populates="connections")
     user1: Mapped["User"] = relationship(foreign_keys=[user1_id], back_populates="connections_as_user1")
     user2: Mapped["User"] = relationship(foreign_keys=[user2_id], back_populates="connections_as_user2")
-    connection_questions: Mapped[list["ConnectionQuestion"]] = relationship(back_populates="connection")
+    connection_questions: Mapped[list["ConnectionQuestion"]] = relationship(
+        back_populates="connection",
+        cascade="all, delete",
+    )
 
     def __repr__(self):
         return f"<Connection(id={self.id}, user1={self.user1_id}, user2={self.user2_id}, status='{self.status}')>"
@@ -195,7 +205,7 @@ class ConnectionQuestion(BigIntAuditBase):
 
     __tablename__ = "connection_questions"
     __table_args__ = (
-        # Ensure each question is only asked once per connection
+        # Ensure each question is only asked once per connection per user
         UniqueConstraint("connection_id", "question_id", "user_id", name="uq_connection_question"),
     )
 

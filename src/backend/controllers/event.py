@@ -7,6 +7,7 @@ from litestar.exceptions import PermissionDeniedException
 from src.backend.lib.dependencies import provide_event_service, provide_question_service
 from src.backend.lib.services import EventService, QuestionService
 from src.backend.lib.utils import admin_user_guard
+from src.backend.models import Question
 from src.backend.schema.event import GetEvent, PatchEvent, PostEvent
 
 MINIMUM_QUESTIONS_REQUIRED = 6
@@ -28,7 +29,7 @@ class EventController(Controller):
         event_service: EventService,
         question_service: QuestionService,
     ) -> GetEvent:
-        questions = await question_service.list()
+        questions = await question_service.list(Question.is_game_question.is_(True))
 
         if len(questions) < MINIMUM_QUESTIONS_REQUIRED:
             msg = f"At least {MINIMUM_QUESTIONS_REQUIRED} questions are required to create an event."

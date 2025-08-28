@@ -2052,6 +2052,22 @@
                     "question_text": {
                         "type": "string"
                     },
+                    "question_type": {
+                        "$ref": "#/components/schemas/QuestionType"
+                    },
+                    "options": {
+                        "oneOf": [
+                            {
+                                "items": {
+                                    "type": "string"
+                                },
+                                "type": "array"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
                     "question_answered": {
                         "type": "boolean"
                     },
@@ -2065,7 +2081,8 @@
                     "id",
                     "question_answered",
                     "question_id",
-                    "question_text"
+                    "question_text",
+                    "question_type"
                 ],
                 "title": "ConnectionQuestionData"
             },
