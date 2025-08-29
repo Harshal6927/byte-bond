@@ -41,6 +41,9 @@ class Settings:
     vakley_port: int = field(
         default_factory=lambda: int(os.getenv("VALKEY_PORT", "6379")),
     )
+    valkey_host: str = field(
+        default_factory=lambda: os.getenv("VALKEY_HOST", "localhost"),
+    )
     vite: ViteSettings = field(default_factory=ViteSettings)
 
     def __post_init__(self) -> None: ...

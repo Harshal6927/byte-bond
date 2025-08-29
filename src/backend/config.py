@@ -140,7 +140,7 @@ admin_plugin = SQLAdminPlugin(
 )
 
 # Vakey
-valkey_config = ValkeyStore(Valkey(port=settings.vakley_port))
+valkey_config = ValkeyStore(Valkey(host=settings.valkey_host, port=settings.vakley_port))
 
 # Rate limiting
 global_rate_limit_config = RateLimitConfig(
