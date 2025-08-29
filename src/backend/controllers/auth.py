@@ -37,7 +37,7 @@ class AuthController(Controller):
         request.set_session({"user_id": user.id})
         return users_service.to_schema(user, schema_type=GetUser)
 
-    @get("/logout")
+    @get("/logout", exclude_from_auth=True, exclude_from_global_rate_limit=True)
     async def logout(self, request: Request[User, Any, Any]) -> Response:
         request.set_session({"user_id": None})
         return Response(content=None)

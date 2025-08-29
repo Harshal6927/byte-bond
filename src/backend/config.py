@@ -3,6 +3,7 @@ from typing import Any
 from litestar.channels import ChannelsPlugin
 from litestar.channels.backends.memory import MemoryChannelsBackend
 from litestar.connection import ASGIConnection
+from litestar.middleware.rate_limit import RateLimitConfig
 from litestar.middleware.session.base import ONE_DAY_IN_SECONDS
 from litestar.middleware.session.server_side import ServerSideSessionBackend, ServerSideSessionConfig
 from litestar.plugins.sqlalchemy import (
@@ -26,6 +27,7 @@ from src.backend.lib.admin import (
     UserAnswerAdminView,
 )
 from src.backend.lib.dependencies import provide_user_service
+from src.backend.lib.rate_limit import CustomRateLimitMiddleware
 from src.backend.models import User
 from src.backend.settings import get_settings
 
@@ -139,3 +141,14 @@ admin_plugin = SQLAdminPlugin(
 
 # Vakey
 valkey_config = ValkeyStore(Valkey(port=settings.vakley_port))
+
+# Rate limiting
+global_rate_limit_config = RateLimitConfig(
+    middleware_class=CustomRateLimitMiddleware,
+    rate_limit=("minute", 60),
+    exclude_opt_key="exclude_from_global_rate_limit",
+)
+answer_question_rate_limit_config = RateLimitConfig(
+    middleware_class=CustomRateLimitMiddleware,
+    rate_limit=("minute", 1),
+)
