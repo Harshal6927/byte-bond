@@ -10,6 +10,7 @@ from src.backend.config import (
     admin_plugin,
     alchemy_plugin,
     channels_plugin,
+    global_rate_limit_config,
     saq_plugin,
     settings,
     sss_auth,
@@ -72,6 +73,6 @@ app = Litestar(
         Exception: exception_handler,
         RepositoryError: exception_handler,
     },
-    middleware=[configure_instrumentation().middleware],
-    stores={"sessions": valkey_config},
+    middleware=[configure_instrumentation().middleware, global_rate_limit_config.middleware],
+    stores={"sessions": valkey_config, "rate_limit": valkey_config},
 )

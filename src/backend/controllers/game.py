@@ -7,6 +7,7 @@ from litestar.controller import Controller
 from litestar.di import Provide
 from litestar.exceptions import ClientException, NotAuthorizedException, NotFoundException, PermissionDeniedException
 
+from src.backend.config import answer_question_rate_limit_config
 from src.backend.lib.dependencies import (
     provide_connection_question_service,
     provide_connection_service,
@@ -256,21 +257,17 @@ class GameController(Controller):
 
         publish_to_channel(
             request=request,
-            data={
-                "message": f"refresh-{current_connection.user1_id}",
-            },
+            data={"message": f"refresh-{current_connection.user1_id}"},
             channel="game-status",
         )
         publish_to_channel(
             request=request,
-            data={
-                "message": f"refresh-{current_connection.user2_id}",
-            },
+            data={"message": f"refresh-{current_connection.user2_id}"},
             channel="game-status",
         )
 
     # Rate limit: 1 request per minute per user
-    @post("/answer-question")
+    @post("/answer-question", middleware=[answer_question_rate_limit_config.middleware])
     async def answer_question(
         self,
         data: GameQuestionResponse,
@@ -415,16 +412,12 @@ class GameController(Controller):
 
         publish_to_channel(
             request=request,
-            data={
-                "message": f"refresh-{current_connection.user1_id}",
-            },
+            data={"message": f"refresh-{current_connection.user1_id}"},
             channel="game-status",
         )
         publish_to_channel(
             request=request,
-            data={
-                "message": f"refresh-{current_connection.user2_id}",
-            },
+            data={"message": f"refresh-{current_connection.user2_id}"},
             channel="game-status",
         )
 
@@ -481,25 +474,19 @@ class GameController(Controller):
         )
         publish_to_channel(
             request=request,
-            data={
-                "message": f"cancelled-{other_user_id}",
-            },
+            data={"message": f"cancelled-{other_user_id}"},
             channel="game-status",
         )
 
         # Refresh game status for both users
         publish_to_channel(
             request=request,
-            data={
-                "message": f"refresh-{current_connection.user1_id}",
-            },
+            data={"message": f"refresh-{current_connection.user1_id}"},
             channel="game-status",
         )
         publish_to_channel(
             request=request,
-            data={
-                "message": f"refresh-{current_connection.user2_id}",
-            },
+            data={"message": f"refresh-{current_connection.user2_id}"},
             channel="game-status",
         )
 
@@ -530,9 +517,7 @@ class GameController(Controller):
 
         publish_to_channel(
             request=request,
-            data={
-                "message": data.message,
-            },
+            data={"message": data.message},
             channel=str(other_user_id),
         )
 

@@ -37,5 +37,7 @@ class OpenTelemetrySingletonMiddleware(OpenTelemetryInstrumentationMiddleware):
 
 
 def configure_instrumentation() -> OpenTelemetryConfig:
-    logfire.configure()
+    from src.backend.config import settings
+
+    logfire.configure(environment="development" if settings.debug else "production")
     return OpenTelemetryConfig(meter=metrics.get_meter(__name__), middleware_class=OpenTelemetrySingletonMiddleware)
