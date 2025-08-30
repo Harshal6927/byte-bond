@@ -7,7 +7,7 @@ from litestar.controller import Controller
 from litestar.di import Provide
 from litestar.exceptions import ClientException, NotAuthorizedException, NotFoundException, PermissionDeniedException
 
-from src.backend.config import answer_question_rate_limit_config
+from src.backend.config import one_rpm_rate_limit_config
 from src.backend.lib.dependencies import (
     provide_connection_question_service,
     provide_connection_service,
@@ -267,7 +267,7 @@ class GameController(Controller):
         )
 
     # Rate limit: 1 request per minute per user
-    @post("/answer-question", middleware=[answer_question_rate_limit_config.middleware])
+    @post("/answer-question", middleware=[one_rpm_rate_limit_config.middleware])
     async def answer_question(
         self,
         data: GameQuestionResponse,

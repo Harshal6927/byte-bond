@@ -4,6 +4,7 @@ from litestar import Request, Response, get, post
 from litestar.controller import Controller
 from litestar.di import Provide
 
+from src.backend.config import five_rpm_rate_limit_config
 from src.backend.lib.dependencies import provide_event_service, provide_user_service
 from src.backend.lib.services import EventService, UserService
 from src.backend.models import User
@@ -19,7 +20,7 @@ class AuthController(Controller):
         "event_service": Provide(provide_event_service),
     }
 
-    @post("/login", exclude_from_auth=True)
+    @post("/login", exclude_from_auth=True, middleware=[five_rpm_rate_limit_config.middleware])
     async def login(
         self,
         data: PostLogin,

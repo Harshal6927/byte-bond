@@ -74,5 +74,10 @@ app = Litestar(
         RepositoryError: exception_handler,
     },
     middleware=[configure_instrumentation().middleware, global_rate_limit_config.middleware],
-    stores={"sessions": valkey_config, "rate_limit": valkey_config},
+    stores={
+        "sessions": valkey_config,
+        "global_rate_limit": valkey_config,
+        "one_rpm_rate_limit": valkey_config,
+        "five_rpm_rate_limit": valkey_config,
+    },
 )

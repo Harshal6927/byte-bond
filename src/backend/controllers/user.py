@@ -6,6 +6,7 @@ from litestar.controller import Controller
 from litestar.di import Provide
 from litestar.exceptions import NotAuthorizedException, PermissionDeniedException
 
+from src.backend.config import five_rpm_rate_limit_config
 from src.backend.lib.dependencies import (
     provide_event_service,
     provide_question_service,
@@ -28,7 +29,7 @@ class UserController(Controller):
         "user_answer_service": Provide(provide_user_answer_service),
     }
 
-    @post(exclude_from_auth=True)
+    @post(exclude_from_auth=True, middleware=[five_rpm_rate_limit_config.middleware])
     async def post_user(
         self,
         data: PostUser,

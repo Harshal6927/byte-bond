@@ -147,8 +147,15 @@ global_rate_limit_config = RateLimitConfig(
     middleware_class=CustomRateLimitMiddleware,
     rate_limit=("minute", 60),
     exclude_opt_key="exclude_from_global_rate_limit",
+    store="global_rate_limit",
 )
-answer_question_rate_limit_config = RateLimitConfig(
+one_rpm_rate_limit_config = RateLimitConfig(
     middleware_class=CustomRateLimitMiddleware,
     rate_limit=("minute", 1),
+    store="one_rpm_rate_limit",
+)
+five_rpm_rate_limit_config = RateLimitConfig(
+    middleware_class=CustomRateLimitMiddleware,
+    rate_limit=("minute", 5),
+    store="five_rpm_rate_limit",
 )

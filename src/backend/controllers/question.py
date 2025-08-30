@@ -5,6 +5,7 @@ from litestar.controller import Controller
 from litestar.di import Provide
 from sqlalchemy import func
 
+from src.backend.config import five_rpm_rate_limit_config
 from src.backend.lib.dependencies import provide_question_service
 from src.backend.lib.services import QuestionService
 from src.backend.lib.utils import admin_user_guard
@@ -27,7 +28,7 @@ class QuestionController(Controller):
         question = await question_service.create(data)
         return question_service.to_schema(question, schema_type=GetQuestion)
 
-    @get(exclude_from_auth=True)
+    @get(exclude_from_auth=True, middleware=[five_rpm_rate_limit_config.middleware])
     async def get_questions(
         self,
         question_service: QuestionService,
